@@ -1,0 +1,108 @@
+/* ==========================================================
+   1. RESET BÁSICO
+   Navegadores diferentes aplicam margens/paddings padrão
+   diferentes. Zeramos tudo para começar do mesmo ponto.
+   ========================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* largura/altura passam a incluir padding e borda */
+}
+
+/* ==========================================================
+   2. VARIÁVEIS DE COR (CUSTOM PROPERTIES)
+   Centralizamos as cores aqui. Se quisermos mudar o tom
+   da biblioteca inteira, mudamos só neste lugar.
+   ========================================================== */
+:root {
+  --cor-primaria: #2c5f2d;   /* verde escuro, remete a "biblioteca/estudo" */
+  --cor-primaria-clara: #97bc62;
+  --cor-texto: #222222;
+  --cor-fundo: #f7f7f2;
+  --cor-branco: #ffffff;
+}
+
+body {
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  color: var(--cor-texto);
+  background-color: var(--cor-fundo);
+  line-height: 1.5;
+}
+
+/* ==========================================================
+   3. CABEÇALHO
+   ========================================================== */
+.cabecalho {
+  background-color: var(--cor-primaria);
+}
+
+.cabecalho__conteudo {
+  max-width: 1100px;
+  margin: 0 auto;           /* centraliza o conteúdo na página */
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;          /* quebra linha em telas pequenas */
+  gap: 1rem;
+}
+
+.cabecalho__logo {
+  color: var(--cor-branco);
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* ==========================================================
+   4. MENU DE NAVEGAÇÃO
+   ========================================================== */
+.menu__lista {
+  list-style: none;         /* remove as bolinhas da lista */
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.menu__link {
+  color: var(--cor-branco);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.menu__link:hover,
+.menu__link--ativo {
+  border-bottom: 2px solid var(--cor-primaria-clara);
+}
+
+/* ==========================================================
+   5. CONTEÚDO PRINCIPAL
+   ========================================================== */
+.conteudo {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  min-height: 60vh;         /* garante que o rodapé não "suba" em páginas curtas */
+}
+
+.boas-vindas h1 {
+  color: var(--cor-primaria);
+  margin-bottom: 1rem;
+}
+
+.boas-vindas p {
+  max-width: 60ch;          /* limita a largura do texto para facilitar leitura */
+}
+
+/* ==========================================================
+   6. RODAPÉ
+   ========================================================== */
+.rodape {
+  background-color: var(--cor-primaria);
+  color: var(--cor-branco);
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}
