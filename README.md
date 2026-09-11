@@ -17,10 +17,20 @@ biblioteca-escolar/
 ├── docs/                    → material de aula (uma aula por arquivo)
 ├── frontend/                → tudo que roda no navegador
 │   ├── index.html
+│   ├── acervo.html
+│   ├── cadastro.html
+│   ├── emprestimos.html
+│   ├── login.html
 │   ├── css/
 │   │   └── style.css
 │   ├── js/
-│   │   └── script.js
+│   │   ├── script.js
+│   │   ├── dados-acervo.js
+│   │   ├── acervo.js
+│   │   ├── cadastro.js
+│   │   ├── emprestimos.js
+│   │   ├── dados-usuarios.js
+│   │   └── login.js
 │   └── assets/               → imagens, ícones etc.
 └── backend/                  → (será criado quando chegarmos nessa etapa)
 ```
@@ -28,10 +38,10 @@ biblioteca-escolar/
 ## Roteiro do projeto
 
 - [x] **Aula 1** — Estrutura base do frontend (pastas, HTML semântico, layout em CSS)
-- [ ] Aula 2 — Tela de listagem do acervo (catálogo de livros)
-- [ ] Aula 3 — Tela de cadastro de livros
-- [ ] Aula 4 — Tela de controle de empréstimos
-- [ ] Aula 5 — Tela de login
+- [x] **Aula 2** — Tela de listagem do acervo (catálogo de livros)
+- [x] **Aula 3** — Tela de cadastro de livros
+- [x] **Aula 4** — Tela de controle de empréstimos
+- [x] **Aula 5** — Tela de login (simulada, sem backend)
 - [ ] Aula 6 — Início do backend com Node.js (servidor e rotas)
 - [ ] Aula 7 — Banco de dados MySQL (modelagem e conexão)
 - [ ] Aula 8 — Integração frontend + backend (consumindo a API)

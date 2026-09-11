@@ -87,6 +87,12 @@ body {
   min-height: 60vh;         /* garante que o rodapé não "suba" em páginas curtas */
 }
 
+/* Variação usada em telas com pouco conteúdo (ex.: login),
+   para o formulário não ficar esticado até 1100px de largura. */
+.conteudo--estreita {
+  max-width: 480px;
+}
+
 .boas-vindas h1 {
   color: var(--cor-primaria);
   margin-bottom: 1rem;
@@ -105,4 +111,235 @@ body {
   text-align: center;
   padding: 1rem;
   font-size: 0.9rem;
+}
+
+/* ==========================================================
+   7. TELA DO ACERVO (aula 2)
+   ========================================================== */
+.acervo h1 {
+  color: var(--cor-primaria);
+  margin-bottom: 0.5rem;
+}
+
+.acervo__busca {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 320px;
+}
+
+.acervo__busca label {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.acervo__busca input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.acervo__busca input:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+}
+
+/* Tabela: usamos border-collapse para juntar as bordas das
+   células, em vez de cada uma ter a sua própria borda dupla. */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--cor-branco);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tabela th,
+.tabela td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.tabela th {
+  background-color: var(--cor-primaria);
+  color: var(--cor-branco);
+}
+
+.tabela tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* "Selo" colorido para indicar o status do livro */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px; /* deixa as pontas bem arredondadas, tipo "pílula" */
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--cor-branco);
+}
+
+.badge--disponivel {
+  background-color: #2f9e44;
+}
+
+.badge--emprestado {
+  background-color: #c0392b;
+}
+
+.mensagem-vazio {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #666;
+}
+
+/* ==========================================================
+   8. FORMULÁRIO DE CADASTRO (aula 3)
+   ========================================================== */
+.cadastro h1 {
+  color: var(--cor-primaria);
+  margin-bottom: 0.5rem;
+}
+
+.cadastro__subtitulo,
+.emprestimos__subtitulo {
+  margin-top: 2.5rem;
+  color: var(--cor-primaria);
+}
+
+.cadastro__aviso {
+  font-size: 0.9rem;
+  color: #666;
+  max-width: 60ch;
+  margin-bottom: 1rem;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 420px;
+  margin: 1.5rem 0;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.campo label {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.campo input,
+.campo select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+}
+
+/* Variação para o campo "Mostrar senha": checkbox e label lado a lado */
+.campo--checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.campo--checkbox label {
+  font-weight: normal;
+}
+
+/* Aplicada via JavaScript quando o campo não passa na validação */
+.campo__input--invalido {
+  border-color: #c0392b;
+}
+
+.campo__erro {
+  min-height: 1.1em;         /* reserva o espaço para não "pular" o layout quando o erro aparece */
+  color: #c0392b;
+  font-size: 0.8rem;
+}
+
+.botao {
+  align-self: flex-start;
+  padding: 0.6rem 1.4rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.botao--primario {
+  background-color: var(--cor-primaria);
+  color: var(--cor-branco);
+}
+
+.botao--primario:hover {
+  background-color: #234c24;
+}
+
+.botao--secundario {
+  background-color: transparent;
+  color: var(--cor-primaria);
+  border: 1px solid var(--cor-primaria);
+  padding: 0.35rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.botao--secundario:hover {
+  background-color: var(--cor-primaria);
+  color: var(--cor-branco);
+}
+
+/* Faixa de aviso (sucesso/erro) acima da tabela de cadastrados */
+.alerta {
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.alerta--sucesso {
+  background-color: #d3f2db;
+  color: #1e5b2a;
+  border: 1px solid #2f9e44;
+}
+
+.alerta--erro {
+  background-color: #fbdedb;
+  color: #7a231a;
+  border: 1px solid #c0392b;
+}
+
+/* ==========================================================
+   9. TELA DE LOGIN (aula 5)
+   ========================================================== */
+
+/* Caixa de aviso didático, explicando que o login é simulado */
+.aviso-seguranca {
+  background-color: #fff6db;
+  border: 1px solid #e0c25a;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.aviso-seguranca code {
+  background-color: rgba(0, 0, 0, 0.08);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.85em;
 }

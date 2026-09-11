@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empréstimos — Biblioteca Escolar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="cabecalho">
+    <div class="cabecalho__conteudo">
+      <a href="index.html" class="cabecalho__logo">📚 Biblioteca Escolar</a>
+
+      <nav class="menu">
+        <ul class="menu__lista">
+          <li><a href="index.html" class="menu__link">Início</a></li>
+          <li><a href="acervo.html" class="menu__link">Acervo</a></li>
+          <li><a href="emprestimos.html" class="menu__link menu__link--ativo">Empréstimos</a></li>
+          <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
+          <li><a href="login.html" class="menu__link">Entrar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <section class="emprestimos">
+      <h1>Empréstimos</h1>
+      <p>Registre o empréstimo de um livro disponível e controle as devoluções.</p>
+
+      <form id="form-emprestimo" class="formulario" novalidate>
+
+        <div class="campo">
+          <label for="livro">Livro *</label>
+          <select id="livro" name="livro" required>
+            <option value="" selected disabled>Selecione um livro disponível</option>
+          </select>
+          <small class="campo__erro" id="erro-livro"></small>
+        </div>
+
+        <div class="campo">
+          <label for="aluno">Nome do aluno *</label>
+          <input type="text" id="aluno" name="aluno" required minlength="2">
+          <small class="campo__erro" id="erro-aluno"></small>
+        </div>
+
+        <div class="campo">
+          <label for="data-prevista">Devolução prevista para *</label>
+          <input type="date" id="data-prevista" name="data-prevista" required>
+          <small class="campo__erro" id="erro-data-prevista"></small>
+        </div>
+
+        <button type="submit" class="botao botao--primario">Registrar empréstimo</button>
+      </form>
+
+      <div id="alerta" class="alerta" hidden></div>
+
+      <h2 class="emprestimos__subtitulo">Empréstimos ativos</h2>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th scope="col">Livro</th>
+            <th scope="col">Aluno</th>
+            <th scope="col">Emprestado em</th>
+            <th scope="col">Devolução prevista</th>
+            <th scope="col">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-emprestimos-corpo"></tbody>
+      </table>
+
+      <p id="mensagem-sem-emprestimos" class="mensagem-vazio" hidden>
+        Nenhum empréstimo ativo no momento.
+      </p>
+
+      <h2 class="emprestimos__subtitulo">Histórico de devoluções (nesta sessão)</h2>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th scope="col">Livro</th>
+            <th scope="col">Aluno</th>
+            <th scope="col">Emprestado em</th>
+            <th scope="col">Devolução prevista</th>
+            <th scope="col">Devolvido em</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-historico-corpo"></tbody>
+      </table>
+
+      <p id="mensagem-sem-historico" class="mensagem-vazio">
+        Nenhuma devolução registrada ainda nesta sessão.
+      </p>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
+  </footer>
+
+  <script src="js/dados-acervo.js"></script>
+  <script src="js/emprestimos.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

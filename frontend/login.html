@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar — Biblioteca Escolar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="cabecalho">
+    <div class="cabecalho__conteudo">
+      <a href="index.html" class="cabecalho__logo">📚 Biblioteca Escolar</a>
+
+      <nav class="menu">
+        <ul class="menu__lista">
+          <li><a href="index.html" class="menu__link">Início</a></li>
+          <li><a href="acervo.html" class="menu__link">Acervo</a></li>
+          <li><a href="emprestimos.html" class="menu__link">Empréstimos</a></li>
+          <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
+          <li><a href="login.html" class="menu__link menu__link--ativo">Entrar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteudo conteudo--estreita">
+    <section class="login">
+      <h1>Entrar</h1>
+      <p>Acesse o sistema com seu usuário e senha.</p>
+
+      <div class="aviso-seguranca">
+        <strong>Só para esta aula:</strong> use <code>bibliotecaria</code> / <code>biblioteca123</code>
+        ou <code>aluno1</code> / <code>aluno123</code>. Este login ainda é só uma simulação —
+        veja o porquê no material da aula.
+      </div>
+
+      <form id="form-login" class="formulario" novalidate>
+
+        <div class="campo">
+          <label for="usuario">Usuário *</label>
+          <input type="text" id="usuario" name="usuario" required autocomplete="username">
+          <small class="campo__erro" id="erro-usuario"></small>
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha *</label>
+          <input type="password" id="senha" name="senha" required autocomplete="current-password">
+          <small class="campo__erro" id="erro-senha"></small>
+        </div>
+
+        <div class="campo campo--checkbox">
+          <input type="checkbox" id="mostrar-senha">
+          <label for="mostrar-senha">Mostrar senha</label>
+        </div>
+
+        <button type="submit" class="botao botao--primario">Entrar</button>
+      </form>
+
+      <div id="alerta" class="alerta" hidden></div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
+  </footer>
+
+  <script src="js/dados-usuarios.js"></script>
+  <script src="js/login.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
