@@ -32,7 +32,10 @@ biblioteca-escolar/
 │   │   ├── dados-usuarios.js
 │   │   └── login.js
 │   └── assets/               → imagens, ícones etc.
-└── backend/                  → (será criado quando chegarmos nessa etapa)
+└── backend/                  → servidor Node.js (API)
+    ├── package.json
+    ├── server.js
+    └── dados-livros.js
 ```
 
 ## Roteiro do projeto
@@ -42,7 +45,7 @@ biblioteca-escolar/
 - [x] **Aula 3** — Tela de cadastro de livros
 - [x] **Aula 4** — Tela de controle de empréstimos
 - [x] **Aula 5** — Tela de login (simulada, sem backend)
-- [ ] Aula 6 — Início do backend com Node.js (servidor e rotas)
+- [x] **Aula 6** — Início do backend com Node.js (servidor e rotas)
 - [ ] Aula 7 — Banco de dados MySQL (modelagem e conexão)
 - [ ] Aula 8 — Integração frontend + backend (consumindo a API)
 - [ ] Aula 9 — Empréstimos e devoluções na prática (regras de negócio)
@@ -52,4 +55,5 @@ Esse roteiro pode mudar conforme o andamento das aulas.
 
 ## Como abrir o projeto até agora
 
-Por enquanto é só HTML/CSS/JS estático, então basta abrir o arquivo `frontend/index.html` no navegador. Instruções detalhadas em `docs/aula-01-estrutura-base.md`.
+- **Frontend:** é só HTML/CSS/JS estático, então basta abrir o arquivo `frontend/index.html` no navegador. Instruções detalhadas em `docs/aula-01-estrutura-base.md`.
+- **Backend:** dentro da pasta `backend/`, rode `npm install` (só na primeira vez) e depois `npm run dev`. O servidor sobe em `http://localhost:3000`. Instruções detalhadas em `docs/aula-06-node-intro.md`. O frontend ainda não consome esse servidor — isso começa na Aula 8.

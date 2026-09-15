@@ -1,0 +1,7 @@
+# Dependências instaladas pelo npm — cada máquina gera a sua própria
+# ao rodar "npm install", então nunca versionamos essa pasta.
+node_modules/
+
+# Arquivos de variáveis de ambiente (senhas, chaves) — usaremos
+# a partir da aula do MySQL. Nunca deve ir para o repositório.
+.env
