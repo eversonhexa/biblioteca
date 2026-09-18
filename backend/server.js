@@ -1,60 +1,86 @@
 // ==========================================================
 // Aula 6 — primeiro servidor com Node.js + Express
-//
-// "require" é a forma do Node.js (fora do navegador) de
-// importar código de outros arquivos ou de bibliotecas
-// instaladas via npm. É equivalente, em espírito, às tags
-// <script> que usamos no frontend — mas o Node não tem HTML,
-// então ele resolve isso com require/module.exports.
+// Aula 7 — /api/livros passou a consultar o MySQL
+// Aula 8 — liberado o CORS
+// Aula 9 — rotas de alunos e empréstimos, com regras de negócio
+// Aula 10 — login de verdade, rotas organizadas em routes/,
+//           e o próprio Express passou a servir o frontend
+// Aula 11 — sessão de verdade (express-session): login passou
+//           a "durar" entre páginas, e rotas sensíveis passaram
+//           a exigir login também no servidor (não só na tela)
 // ==========================================================
 
+const path = require("path");
+require("dotenv").config();
+
 const express = require("express");
-const listaDeLivros = require("./dados-livros");
+const session = require("express-session");
+const cors = require("cors");
+
+const rotasLivros = require("./routes/livros");
+const rotasAlunos = require("./routes/alunos");
+const rotasEmprestimos = require("./routes/emprestimos");
+const rotasAuth = require("./routes/auth");
 
 const app = express();
-const PORTA = 3000;
+const PORTA = process.env.PORT || 3000;
 
-// ----------------------------------------------------------
-// Rotas
-//
-// Uma "rota" é a combinação de um MÉTODO HTTP (GET, POST,
-// PUT, DELETE...) com um CAMINHO (ex.: "/api/livros"). É
-// assim que o servidor sabe o que fazer com cada pedido que
-// chega. Por enquanto só usamos GET (buscar dados) — os
-// outros métodos (para cadastrar, editar, excluir) vêm nas
-// próximas aulas, quando conectarmos o banco de dados.
-// ----------------------------------------------------------
+// cors() com credenciais desligadas funciona bem quando frontend
+// e backend são servidos pela mesma origem (seção 6, Aula 10) —
+// que é justamente o que sessão por cookie exige (veja o material
+// da Aula 11 para entender por quê).
+app.use(cors());
+app.use(express.json());
 
-// Rota "raiz": só para confirmar, no navegador, que o
-// servidor está respondendo.
-app.get("/", (req, res) => {
-  res.send("Servidor da Biblioteca Escolar no ar! Veja /api/status e /api/livros.");
+// A sessão precisa vir ANTES das rotas que a utilizam, para que
+// "req.session" já exista quando elas forem executadas.
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "segredo-de-desenvolvimento-troque-no-env",
+    resave: false, // não regrava a sessão no armazenamento se nada mudou
+    saveUninitialized: false, // não cria sessão para quem nunca logou
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 4, // 4 horas
+      // "secure: true" exigiria HTTPS — deixamos "false" porque,
+      // no cenário desta aula (rede da escola, sem HTTPS), o
+      // cookie precisa funcionar também em HTTP simples.
+      secure: false,
+    },
+  })
+);
+
+// Faz o Express servir os arquivos do frontend diretamente
+// (HTML, CSS, JS, imagens) — o mesmo servidor que expõe a API
+// agora também entrega as páginas. Na prática, a partir de
+// agora dá para abrir http://localhost:3000/ direto, SEM
+// precisar do Live Server, e ver o site completo funcionando.
+// path.join(__dirname, "..", "frontend") monta o caminho
+// absoluto até a pasta frontend/, a partir de onde quer que o
+// projeto esteja no disco de cada pessoa.
+app.use(express.static(path.join(__dirname, "..", "frontend")));
+
+// Cada "router" cuida só do seu próprio grupo de rotas — aqui
+// definimos o PREFIXO da URL de cada um. Dentro dos arquivos em
+// routes/, as rotas são escritas sem esse prefixo (ex.: "/",
+// "/:id/devolucao").
+app.use("/api/livros", rotasLivros);
+app.use("/api/alunos", rotasAlunos);
+app.use("/api/emprestimos", rotasEmprestimos);
+app.use("/api", rotasAuth); // define POST /api/login
+
+// Rota de "saúde" (health check), continua aqui por ser bem
+// genérica — não pertence a nenhum recurso específico.
+const pool = require("./db");
+app.get("/api/status", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.json({ status: "ok", banco: "conectado", horario: new Date().toISOString() });
+  } catch (erro) {
+    console.error("Falha ao conectar no banco:", erro.message);
+    res.status(500).json({ status: "erro", banco: "não foi possível conectar" });
+  }
 });
 
-// Uma rota simples de "saúde" (health check), comum em APIs
-// reais, usada para verificar rapidamente se o servidor está
-// funcionando (ex.: por ferramentas de monitoramento).
-app.get("/api/status", (req, res) => {
-  res.json({
-    status: "ok",
-    mensagem: "Servidor da Biblioteca Escolar funcionando.",
-    horario: new Date().toISOString(),
-  });
-});
-
-// A rota que interessa de verdade: devolve a lista de livros
-// em formato JSON. Note que é o MESMO formato de dados que já
-// usávamos no frontend (frontend/js/dados-acervo.js) — só que
-// agora entregue por um servidor, não mais "fixo" na página.
-app.get("/api/livros", (req, res) => {
-  res.json(listaDeLivros);
-});
-
-// ----------------------------------------------------------
-// Inicializa o servidor, deixando-o "escutando" pedidos na
-// porta 3000. Só depois desta chamada o servidor de fato
-// começa a responder.
-// ----------------------------------------------------------
 app.listen(PORTA, () => {
   console.log(`Servidor rodando em http://localhost:${PORTA}`);
 });

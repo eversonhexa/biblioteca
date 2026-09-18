@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastrar Livro — Biblioteca Escolar</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,7 +19,8 @@
           <li><a href="acervo.html" class="menu__link">Acervo</a></li>
           <li><a href="emprestimos.html" class="menu__link">Empréstimos</a></li>
           <li><a href="cadastro.html" class="menu__link menu__link--ativo">Cadastrar Livro</a></li>
-          <li><a href="login.html" class="menu__link">Entrar</a></li>
+          <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
+          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
         </ul>
       </nav>
     </div>
@@ -28,6 +30,10 @@
     <section class="cadastro">
       <h1>Cadastrar Livro</h1>
       <p>Preencha os dados do livro para adicioná-lo ao acervo.</p>
+
+      <p id="mensagem-login-necessario" class="aviso-seguranca" hidden>
+        Você precisa <a href="login.html">fazer login</a> para cadastrar livros.
+      </p>
 
       <!-- novalidate: desligamos as mensagens padrão do navegador
            para mostrar as nossas próprias, em português e com
@@ -67,16 +73,24 @@
           <small class="campo__erro" id="erro-ano"></small>
         </div>
 
+        <div class="campo">
+          <label for="isbn">ISBN</label>
+          <input type="text" id="isbn" name="isbn" placeholder="Ex.: 978-85-359-0277-5" inputmode="numeric" maxlength="20" autocomplete="off">
+          <small class="campo__dica">Opcional — 13 dígitos. Livros anteriores a 1970 geralmente não têm.</small>
+          <small class="campo__erro" id="erro-isbn"></small>
+        </div>
+
         <button type="submit" class="botao botao--primario">Cadastrar</button>
       </form>
 
       <div id="alerta" class="alerta" hidden></div>
 
-      <h2 class="cadastro__subtitulo">Livros cadastrados nesta sessão</h2>
+      <h2 class="cadastro__subtitulo">Livros cadastrados nesta visita</h2>
       <p class="cadastro__aviso">
-        Esta lista existe só enquanto a página estiver aberta — como ainda não
-        temos um backend nem banco de dados, tudo se perde ao recarregar a
-        página. Isso vai mudar quando construirmos o Node.js e o MySQL.
+        Esta tabela mostra só os livros que você cadastrou desde que abriu
+        esta página (para dar um retorno rápido). Os dados já são gravados de
+        verdade no banco — para ver o acervo completo, incluindo cadastros
+        anteriores, visite a tela <a href="acervo.html">Acervo</a>.
       </p>
 
       <table class="tabela">
@@ -86,6 +100,7 @@
             <th scope="col">Autor</th>
             <th scope="col">Categoria</th>
             <th scope="col">Ano</th>
+            <th scope="col">ISBN</th>
           </tr>
         </thead>
         <tbody id="tabela-cadastrados-corpo"></tbody>
@@ -97,6 +112,7 @@
     <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
   </footer>
 
+  <script src="js/auth.js"></script>
   <script src="js/cadastro.js"></script>
   <script src="js/script.js"></script>
 </body>

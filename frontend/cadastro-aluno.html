@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Aluno — Biblioteca Escolar</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="cabecalho">
+    <div class="cabecalho__conteudo">
+      <a href="index.html" class="cabecalho__logo">📚 Biblioteca Escolar</a>
+
+      <nav class="menu">
+        <ul class="menu__lista">
+          <li><a href="index.html" class="menu__link">Início</a></li>
+          <li><a href="acervo.html" class="menu__link">Acervo</a></li>
+          <li><a href="emprestimos.html" class="menu__link">Empréstimos</a></li>
+          <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
+          <li><a href="cadastro-aluno.html" class="menu__link menu__link--ativo">Cadastrar Aluno</a></li>
+          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <section class="cadastro">
+      <h1>Cadastrar Aluno</h1>
+      <p>Preencha os dados do aluno para liberar empréstimos em seu nome.</p>
+
+      <p id="mensagem-login-necessario" class="aviso-seguranca" hidden>
+        Você precisa <a href="login.html">fazer login</a> para cadastrar alunos.
+      </p>
+
+      <!-- novalidate: desligamos as mensagens padrão do navegador
+           para mostrar as nossas próprias, em português e com
+           o mesmo visual do resto do site — mesmo padrão já usado
+           no cadastro de livros. -->
+      <form id="form-cadastro-aluno" class="formulario" novalidate>
+
+        <div class="campo">
+          <label for="nome">Nome *</label>
+          <input type="text" id="nome" name="nome" required minlength="2">
+          <small class="campo__erro" id="erro-nome"></small>
+        </div>
+
+        <div class="campo">
+          <label for="turma">Turma</label>
+          <input type="text" id="turma" name="turma" placeholder="Ex.: 9º A" maxlength="30" autocomplete="off">
+          <small class="campo__dica">Opcional.</small>
+          <small class="campo__erro" id="erro-turma"></small>
+        </div>
+
+        <button type="submit" class="botao botao--primario">Cadastrar</button>
+      </form>
+
+      <div id="alerta" class="alerta" hidden></div>
+
+      <h2 class="cadastro__subtitulo">Alunos cadastrados nesta visita</h2>
+      <p class="cadastro__aviso">
+        Esta tabela mostra só os alunos que você cadastrou desde que abriu
+        esta página (para dar um retorno rápido). Os dados já são gravados
+        de verdade no banco — o aluno já aparece imediatamente no seletor
+        da tela <a href="emprestimos.html">Empréstimos</a>.
+      </p>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">Turma</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-cadastrados-corpo"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/cadastro-aluno.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,4 +1,9 @@
 // ==========================================================
+// [ARQUIVO HISTÓRICO — desde a Aula 7 não é mais usado por
+// server.js, que passou a consultar a tabela "livros" do
+// MySQL (veja sql/schema.sql e db.js). Deixamos este arquivo
+// aqui só para você comparar "antes x depois".]
+//
 // Aula 6 — dados de exemplo do acervo, agora no BACKEND
 //
 // Este é o mesmo conteúdo que existia em

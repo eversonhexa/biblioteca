@@ -272,6 +272,12 @@ body {
   font-size: 0.8rem;
 }
 
+/* Texto de ajuda abaixo de um campo (ex.: explicando que é opcional) */
+.campo__dica {
+  color: #666;
+  font-size: 0.8rem;
+}
+
 .botao {
   align-self: flex-start;
   padding: 0.6rem 1.4rem;

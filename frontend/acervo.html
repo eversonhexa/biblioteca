@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Acervo — Biblioteca Escolar</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,7 +19,8 @@
           <li><a href="acervo.html" class="menu__link menu__link--ativo">Acervo</a></li>
           <li><a href="emprestimos.html" class="menu__link">Empréstimos</a></li>
           <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
-          <li><a href="login.html" class="menu__link">Entrar</a></li>
+          <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
+          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
         </ul>
       </nav>
     </div>
@@ -28,6 +30,8 @@
     <section class="acervo">
       <h1>Acervo</h1>
       <p>Consulte os livros cadastrados na biblioteca.</p>
+
+      <div id="alerta" class="alerta" hidden></div>
 
       <div class="acervo__busca">
         <label for="campo-busca">Buscar por título ou autor:</label>
@@ -39,6 +43,10 @@
         >
       </div>
 
+      <p id="mensagem-carregando" class="mensagem-vazio" hidden>
+        Carregando acervo...
+      </p>
+
       <table class="tabela">
         <thead>
           <tr>
@@ -46,11 +54,13 @@
             <th scope="col">Autor</th>
             <th scope="col">Categoria</th>
             <th scope="col">Ano</th>
+            <th scope="col">ISBN</th>
             <th scope="col">Status</th>
           </tr>
         </thead>
-        <!-- As linhas <tr> aqui dentro são geradas pelo JavaScript,
-             a partir da lista de livros em js/dados-acervo.js -->
+        <!-- As linhas <tr> aqui dentro são geradas pelo JavaScript
+             (js/acervo.js), a partir dos dados buscados na API
+             do backend (GET /api/livros). -->
         <tbody id="tabela-acervo-corpo"></tbody>
       </table>
 
@@ -64,7 +74,7 @@
     <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
   </footer>
 
-  <script src="js/dados-acervo.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/acervo.js"></script>
   <script src="js/script.js"></script>
 </body>

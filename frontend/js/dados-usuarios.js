@@ -1,4 +1,11 @@
 // ==========================================================
+// [ARQUIVO HISTÓRICO — desde a Aula 10, login.html/login.js
+// não usam mais este array. O login agora é conferido de
+// verdade no servidor (POST /api/login), contra senhas com
+// hash guardadas no banco (veja backend/utils/senha.js e
+// backend/scripts/criar-usuarios.js). Fica aqui só como
+// registro de como o projeto começou — e do que NÃO fazer.]
+//
 // Aula 5 — usuários de teste para o login simulado
 //
 // ATENÇÃO — ISTO NÃO É SEGURO E NUNCA DEVE SER FEITO EM UM

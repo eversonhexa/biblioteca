@@ -1,16 +1,13 @@
 // ==========================================================
+// [ARQUIVO HISTÓRICO — desde a Aula 9, nenhuma página do
+// frontend usa mais este arquivo. Acervo (Aula 8) e Empréstimos
+// (Aula 9) já buscam tudo de verdade no backend/MySQL. Fica
+// aqui só como registro de como o projeto começou.]
+//
 // Aula 2 — dados de exemplo do acervo
 //
 // Por enquanto os livros estão "fixos" aqui, dentro de um
-// array de objetos JavaScript. Cada objeto representa um
-// livro, com as mesmas informações que futuramente virão
-// de uma tabela no banco de dados MySQL.
-//
-// Quando o backend estiver pronto (mais adiante no curso),
-// vamos SUBSTITUIR só este arquivo por uma chamada à API
-// (fetch) — o resto do código (acervo.js) não vai precisar
-// mudar quase nada, porque já trabalha com um array de livros,
-// não importa de onde ele veio.
+// array de objetos JavaScript.
 // ==========================================================
 
 const listaDeLivros = [
@@ -24,6 +21,4 @@ const listaDeLivros = [
   { id: 8, titulo: "Grande Sertão: Veredas", autor: "Guimarães Rosa", categoria: "Romance", ano: 1956, status: "disponivel" },
   { id: 9, titulo: "Auto da Compadecida", autor: "Ariano Suassuna", categoria: "Teatro", ano: 1955, status: "emprestado" },
   { id: 10, titulo: "Quincas Borba", autor: "Machado de Assis", categoria: "Romance", ano: 1891, status: "disponivel" },
-  { id: 11, titulo: "O Guarani", autor: "José de Alencar", categoria: "Romance", ano: 1857, status: "disponivel" },
-  
 ];

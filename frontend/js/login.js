@@ -1,12 +1,14 @@
 // ==========================================================
-// Aula 5 — login simulado
-//
-// Confere o usuário/senha digitados contra o array
-// "usuariosDeTeste" (de dados-usuarios.js). É só uma simulação
-// para praticarmos o formulário — a autenticação de verdade,
-// com senha criptografada e conferida no servidor, vem nas
-// aulas de backend.
+// Aula 5 — login simulado (comparava contra um array no navegador)
+// Aula 10 — login de verdade: o servidor confere a senha contra
+//           um hash guardado no banco (POST /api/login)
+// Aula 11 — URL relativa (precisa ser aberta a partir do próprio
+//           backend, http://localhost:3000/...) e redirecionamento
+//           para a página inicial após o login, já que agora o
+//           login cria uma sessão que vale para as outras páginas
 // ==========================================================
+
+const URL_API_LOGIN = "/api/login";
 
 const formularioLogin = document.getElementById("form-login");
 const campoSenha = document.getElementById("senha");
@@ -15,13 +17,11 @@ const campoAlertaLogin = document.getElementById("alerta");
 
 // ---------- Mostrar/ocultar senha ----------
 
-// O input começa como type="password" (bolinhas no lugar do texto).
-// Ao marcar o checkbox, trocamos o type para "text", revelando a senha.
 checkboxMostrarSenha.addEventListener("change", () => {
   campoSenha.type = checkboxMostrarSenha.checked ? "text" : "password";
 });
 
-// ---------- Validação e alerta (mesmo padrão das aulas 3 e 4) ----------
+// ---------- Validação e alerta (mesmo padrão das aulas anteriores) ----------
 
 function mostrarErroDoCampo(idCampo, mensagem) {
   const campoErro = document.getElementById(`erro-${idCampo}`);
@@ -45,7 +45,7 @@ function mostrarAlerta(tipo, mensagem) {
 
 // ---------- Envio do formulário ----------
 
-formularioLogin.addEventListener("submit", (evento) => {
+formularioLogin.addEventListener("submit", async (evento) => {
   evento.preventDefault();
   limparErros();
 
@@ -58,7 +58,6 @@ formularioLogin.addEventListener("submit", (evento) => {
     mostrarErroDoCampo("usuario", "Informe seu usuário.");
     valido = false;
   }
-
   if (senha === "") {
     mostrarErroDoCampo("senha", "Informe sua senha.");
     valido = false;
@@ -69,23 +68,34 @@ formularioLogin.addEventListener("submit", (evento) => {
     return;
   }
 
-  // Procura, no array de usuários de teste, alguém com esse
-  // usuário E essa senha ao mesmo tempo.
-  const usuarioEncontrado = usuariosDeTeste.find(
-    (item) => item.usuario === usuario && item.senha === senha
-  );
+  try {
+    const resposta = await fetch(URL_API_LOGIN, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usuario, senha }),
+    });
 
-  if (!usuarioEncontrado) {
-    // De propósito, NÃO dizemos se o erro foi no usuário ou na
-    // senha — só "usuário ou senha inválidos". Isso é uma boa
-    // prática de segurança: não ajudar quem está tentando
-    // adivinhar credenciais a saber qual dos dois campos errou.
-    mostrarAlerta("erro", "Usuário ou senha inválidos.");
-    return;
+    const corpo = await resposta.json();
+
+    if (!resposta.ok) {
+      // A mensagem ("Usuário ou senha inválidos.") vem pronta
+      // do servidor — é ele quem decide o que pode ser revelado.
+      mostrarAlerta("erro", corpo.erro || "Não foi possível entrar.");
+      return;
+    }
+
+    mostrarAlerta("sucesso", `Bem-vindo(a), ${corpo.nome}! Redirecionando...`);
+    formularioLogin.reset();
+    campoSenha.type = "password";
+    checkboxMostrarSenha.checked = false;
+
+    // Pequena pausa só para a pessoa conseguir ler a mensagem de
+    // sucesso antes de sair da página.
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 1000);
+  } catch (erro) {
+    console.error("Falha de rede ao tentar login:", erro);
+    mostrarAlerta("erro", "Não foi possível falar com o servidor. Verifique se o backend está rodando.");
   }
-
-  mostrarAlerta("sucesso", `Bem-vindo(a), ${usuarioEncontrado.nome}! (login simulado — sem sessão real ainda)`);
-  formularioLogin.reset();
-  campoSenha.type = "password";
-  checkboxMostrarSenha.checked = false;
 });

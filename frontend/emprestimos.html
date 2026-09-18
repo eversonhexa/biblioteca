@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Empréstimos — Biblioteca Escolar</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,7 +19,8 @@
           <li><a href="acervo.html" class="menu__link">Acervo</a></li>
           <li><a href="emprestimos.html" class="menu__link menu__link--ativo">Empréstimos</a></li>
           <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
-          <li><a href="login.html" class="menu__link">Entrar</a></li>
+          <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
+          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
         </ul>
       </nav>
     </div>
@@ -28,6 +30,11 @@
     <section class="emprestimos">
       <h1>Empréstimos</h1>
       <p>Registre o empréstimo de um livro disponível e controle as devoluções.</p>
+
+      <p id="mensagem-login-necessario" class="aviso-seguranca" hidden>
+        Você precisa <a href="login.html">fazer login</a> para registrar empréstimos ou devoluções.
+        A consulta abaixo continua disponível para qualquer pessoa.
+      </p>
 
       <form id="form-emprestimo" class="formulario" novalidate>
 
@@ -40,8 +47,10 @@
         </div>
 
         <div class="campo">
-          <label for="aluno">Nome do aluno *</label>
-          <input type="text" id="aluno" name="aluno" required minlength="2">
+          <label for="aluno">Aluno *</label>
+          <select id="aluno" name="aluno" required>
+            <option value="" selected disabled>Selecione um aluno</option>
+          </select>
           <small class="campo__erro" id="erro-aluno"></small>
         </div>
 
@@ -55,6 +64,10 @@
       </form>
 
       <div id="alerta" class="alerta" hidden></div>
+
+      <p id="mensagem-carregando" class="mensagem-vazio" hidden>
+        Carregando dados...
+      </p>
 
       <h2 class="emprestimos__subtitulo">Empréstimos ativos</h2>
 
@@ -75,7 +88,7 @@
         Nenhum empréstimo ativo no momento.
       </p>
 
-      <h2 class="emprestimos__subtitulo">Histórico de devoluções (nesta sessão)</h2>
+      <h2 class="emprestimos__subtitulo">Histórico de devoluções</h2>
 
       <table class="tabela">
         <thead>
@@ -90,8 +103,8 @@
         <tbody id="tabela-historico-corpo"></tbody>
       </table>
 
-      <p id="mensagem-sem-historico" class="mensagem-vazio">
-        Nenhuma devolução registrada ainda nesta sessão.
+      <p id="mensagem-sem-historico" class="mensagem-vazio" hidden>
+        Nenhuma devolução registrada ainda.
       </p>
     </section>
   </main>
@@ -100,7 +113,7 @@
     <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
   </footer>
 
-  <script src="js/dados-acervo.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/emprestimos.js"></script>
   <script src="js/script.js"></script>
 </body>

@@ -1,24 +1,37 @@
 // ==========================================================
-// Aula 3 — formulário de cadastro de livros
+// Aula 3 — formulário de cadastro de livros (validação "na mão"
+//           e uma tabelinha só em memória, sem backend)
 //
-// Este script:
-//   1. Valida os campos do formulário "na mão" (sem depender
-//      só da validação automática do navegador);
-//   2. Se estiver tudo certo, guarda o livro em um array
-//      (só na memória do navegador) e mostra numa tabelinha
-//      logo abaixo do formulário.
+// Aula 11 — cadastro de verdade: este formulário passou a
+// exigir login e a gravar no banco de verdade, via
+// POST /api/livros (backend/routes/livros.js). Até aqui, esta
+// tela só guardava os livros na memória do navegador — qualquer
+// pessoa, logada ou não, conseguia "cadastrar" e nada era salvo.
+// Agora, sem estar logado, o formulário nem aparece; e mesmo que
+// alguém tentasse chamar a API direto sem sessão, o servidor
+// recusaria com 401 (a proteção que realmente importa é essa,
+// no servidor — a tela só evita o usuário tentar à toa).
 //
-// IMPORTANTE: como ainda não existe backend nem banco de dados,
-// os livros cadastrados aqui NÃO aparecem na tela "Acervo" e
-// somem se a página for recarregada. Isso é esperado nesta
-// aula — resolveremos quando estudarmos Node.js + MySQL.
+// Ajuste (depois da Aula 11) — campo ISBN, opcional, validado
+// tanto aqui (feedback rápido) quanto no servidor (proteção real).
 // ==========================================================
 
+const URL_API_LIVROS = "/api/livros";
+
+// Tira tudo que não for dígito (hífens, espaços) — assim aceitamos
+// tanto "9788535902775" quanto "978-85-359-0277-5" digitados.
+function normalizarIsbn(valor) {
+  return valor.replace(/[^0-9]/g, "");
+}
+
+const mensagemLoginNecessario = document.getElementById("mensagem-login-necessario");
 const formulario = document.getElementById("form-cadastro");
 const campoAlerta = document.getElementById("alerta");
 const corpoTabelaCadastrados = document.getElementById("tabela-cadastrados-corpo");
 
-// Lista dos livros cadastrados NESTA sessão (some ao recarregar a página)
+// Lista dos livros cadastrados NESTA visita à página (é só uma
+// conveniência visual — quem quiser ver tudo que já existe no
+// acervo deve ir até a tela Acervo, que consulta o banco inteiro).
 const livrosCadastrados = [];
 
 // Mostra uma mensagem de erro embaixo de um campo específico
@@ -51,6 +64,12 @@ function mostrarAlerta(tipo, mensagem) {
 // Valida os campos do formulário. Devolve um objeto com os
 // dados já "limpos" (trim) se tudo estiver certo, ou null
 // se algum campo estiver inválido (e já mostra os erros).
+//
+// Repare que esta validação é IDÊNTICA à que o servidor faz de
+// novo em POST /api/livros. Isso não é duplicação por descuido:
+// a validação aqui é só para dar feedback rápido, sem esperar o
+// servidor; a validação de lá é a que realmente protege o banco,
+// porque a desta tela pode sempre ser pulada por quem quiser.
 function validarFormulario() {
   limparErros();
 
@@ -82,14 +101,21 @@ function validarFormulario() {
     valido = false;
   }
 
+  // ISBN é opcional — só validamos o formato quando algo foi digitado.
+  const isbn = normalizarIsbn(formulario.isbn.value);
+  if (isbn !== "" && isbn.length !== 13) {
+    mostrarErroDoCampo("isbn", "O ISBN, se informado, deve ter 13 dígitos.");
+    valido = false;
+  }
+
   if (!valido) {
     return null;
   }
 
-  return { titulo, autor, categoria, ano };
+  return { titulo, autor, categoria, ano, isbn };
 }
 
-// Desenha a tabela de livros cadastrados nesta sessão.
+// Desenha a tabela de livros cadastrados nesta visita.
 function renderizarCadastrados() {
   corpoTabelaCadastrados.innerHTML = "";
 
@@ -100,16 +126,14 @@ function renderizarCadastrados() {
       <td>${livro.autor}</td>
       <td>${livro.categoria}</td>
       <td>${livro.ano}</td>
+      <td>${livro.isbn || "—"}</td>
     `;
     corpoTabelaCadastrados.appendChild(linha);
   });
 }
 
 // Evento principal: quando o formulário é enviado.
-formulario.addEventListener("submit", (evento) => {
-  // Impede o comportamento padrão do navegador, que seria
-  // recarregar a página (já que não temos um servidor para
-  // receber esses dados ainda).
+formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();
 
   const dadosValidados = validarFormulario();
@@ -119,15 +143,51 @@ formulario.addEventListener("submit", (evento) => {
     return;
   }
 
-  const novoLivro = {
-    id: Date.now(),          // um jeito simples e único de gerar um id por enquanto
-    ...dadosValidados,        // titulo, autor, categoria, ano
-    status: "disponivel",
-  };
+  try {
+    const resposta = await fetch(URL_API_LIVROS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dadosValidados),
+    });
 
-  livrosCadastrados.push(novoLivro);
-  renderizarCadastrados();
+    // O corpo (sucesso OU erro) sempre vem em JSON.
+    const corpo = await resposta.json();
 
-  mostrarAlerta("sucesso", `Livro "${novoLivro.titulo}" cadastrado nesta sessão com sucesso!`);
-  formulario.reset();
+    if (!resposta.ok) {
+      if (resposta.status === 401) {
+        // A sessão pode ter expirado enquanto a pessoa preenchia
+        // o formulário. Atualizamos a tela para o estado
+        // "deslogado" em vez de deixar o formulário visível
+        // sem funcionar.
+        mostrarAlerta("erro", "Sua sessão expirou. Faça login novamente para cadastrar livros.");
+        await protegerPagina();
+        return;
+      }
+      mostrarAlerta("erro", corpo.erro || "Não foi possível cadastrar o livro.");
+      return;
+    }
+
+    livrosCadastrados.push(corpo.livro);
+    renderizarCadastrados();
+
+    mostrarAlerta("sucesso", `Livro "${corpo.livro.titulo}" cadastrado com sucesso!`);
+    formulario.reset();
+  } catch (erro) {
+    console.error("Falha de rede ao cadastrar livro:", erro);
+    mostrarAlerta("erro", "Não foi possível falar com o servidor. Verifique se o backend está rodando.");
+  }
 });
+
+// ---------- Login (Aula 11) ----------
+
+// Consulta a sessão atual e mostra o formulário só para quem
+// está logado. Quem não está logado vê apenas a mensagem
+// pedindo para entrar — o formulário fica com "hidden".
+async function protegerPagina() {
+  const sessao = await obterSessaoAtual();
+
+  formulario.hidden = !sessao;
+  mensagemLoginNecessario.hidden = Boolean(sessao);
+}
+
+protegerPagina();
