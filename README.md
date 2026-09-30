@@ -74,6 +74,8 @@ biblioteca-escolar/
 
 Roteiro concluído — ideias para continuar depois do curso estão no final de `docs/aula-12-cadastro-alunos.md`.
 
+Além do material aula a aula, `docs/conceitos-backend.md` reúne, organizado por assunto (estrutura, configuração, banco de dados, autenticação, integração com o frontend), os conceitos usados na construção do backend — bom para revisão ou para quem quer uma visão geral sem seguir a ordem cronológica das aulas.
+
 ## Como rodar o projeto completo
 
 1. Tenha o MySQL instalado e rodando.
