@@ -38,6 +38,9 @@ CREATE TABLE IF NOT EXISTS livros (
   -- linhas ainda podem ficar com isbn NULL ao mesmo tempo (o
   -- MySQL não considera NULL igual a NULL para fins de UNIQUE).
   isbn VARCHAR(13) NULL UNIQUE,
+  -- Ajuste (cadastro de livros) — editora: opcional, porque nem
+  -- todo livro antigo do acervo tem essa informação registrada.
+  editora VARCHAR(120) NULL,
   status ENUM('disponivel', 'emprestado') NOT NULL DEFAULT 'disponivel'
 );
 
@@ -46,6 +49,10 @@ CREATE TABLE IF NOT EXISTS livros (
 -- rode só o comando abaixo, uma vez, para adicionar a coluna que
 -- falta (remova o "--" do início da linha antes de executar):
 -- ALTER TABLE livros ADD COLUMN isbn VARCHAR(13) NULL UNIQUE AFTER ano;
+
+-- O mesmo vale para quem já tinha a coluna "isbn" mas ainda não
+-- tem "editora" (remova o "--" do início da linha antes de executar):
+-- ALTER TABLE livros ADD COLUMN editora VARCHAR(120) NULL AFTER isbn;
 
 -- ----------------------------------------------------------
 -- Tabela: alunos

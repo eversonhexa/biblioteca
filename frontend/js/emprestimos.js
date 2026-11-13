@@ -1,41 +1,50 @@
 // ==========================================================
-// Aula 4 — controle de empréstimos (versão inicial, em memória)
-// Aula 9 — integrado de verdade com o backend/MySQL
+// Evolução 1 — consulta, empréstimo e devolução, tudo em uma
+// tela só.
 //
-// A regra de negócio ("só empresta livro disponível") saiu
-// daqui e foi para o servidor (server.js) — o que fazemos
-// agora é: buscar dados prontos da API, montar o pedido de
-// empréstimo/devolução, e mostrar a resposta que o servidor
-// devolver (seja sucesso, seja um erro de regra de negócio).
+// Antes, eram duas telas: "Acervo" (só consulta, de graça para
+// qualquer um) e "Empréstimos" (um formulário com <select> de
+// livro + <select> de aluno, mais duas tabelas separadas de
+// ativos/histórico). Agora:
 //
-// Aula 11 — URLs relativas; e o formulário de empréstimo, mais o
-// botão "Registrar devolução", agora exigem login. A regra de
-// verdade já está protegida no SERVIDOR (POST/PUT exigem sessão
-// — veja backend/routes/emprestimos.js); aqui na tela só
-// escondemos os controles para quem não está logado, como
-// conveniência — é por isso que tratamos também o status 401
-// que pode voltar do servidor (ex.: sessão expirou no meio da
-// visita).
+//   - A consulta exige login (ver backend/routes/livros.js).
+//   - GET /api/livros já devolve, para cada livro emprestado,
+//     quem pegou e até quando — então a MESMA tabela de busca
+//     mostra o status completo, sem precisar de uma segunda
+//     tabela de "empréstimos ativos".
+//   - Em vez de escolher o livro numa lista separada, a pessoa
+//     clica em "Emprestar" na própria linha do livro desejado —
+//     um pequeno painel aparece só para escolher o aluno e a
+//     data prevista. Clicar em "Registrar devolução" já
+//     executa a devolução direto, sem formulário.
 // ==========================================================
 
 const URL_API_LIVROS = "/api/livros";
 const URL_API_ALUNOS = "/api/alunos";
 const URL_API_EMPRESTIMOS = "/api/emprestimos";
 
-// Guardamos aqui o resultado de obterSessaoAtual() (definida em
-// js/auth.js), consultado uma vez ao carregar a página.
-let sessaoAtual = null;
-
 const mensagemLoginNecessario = document.getElementById("mensagem-login-necessario");
-const formularioEmprestimo = document.getElementById("form-emprestimo");
-const selectLivro = document.getElementById("livro");
-const selectAluno = document.getElementById("aluno");
-const campoAlertaEmprestimo = document.getElementById("alerta");
+const conteudoProtegido = document.getElementById("conteudo-protegido");
+
+const campoAlerta = document.getElementById("alerta");
+const campoDeBusca = document.getElementById("campo-busca");
+const mensagemVazio = document.getElementById("mensagem-vazio");
 const mensagemCarregando = document.getElementById("mensagem-carregando");
-const corpoTabelaAtivos = document.getElementById("tabela-emprestimos-corpo");
+const corpoDaTabelaAcervo = document.getElementById("tabela-acervo-corpo");
+
+const painelEmprestimo = document.getElementById("painel-emprestimo");
+const painelEmprestimoTitulo = document.getElementById("painel-emprestimo-titulo");
+const formularioEmprestimo = document.getElementById("form-emprestimo");
+const campoLivroId = document.getElementById("livro-id");
+const selectAluno = document.getElementById("aluno");
+const botaoCancelarEmprestimo = document.getElementById("botao-cancelar-emprestimo");
+
 const corpoTabelaHistorico = document.getElementById("tabela-historico-corpo");
-const mensagemSemEmprestimos = document.getElementById("mensagem-sem-emprestimos");
 const mensagemSemHistorico = document.getElementById("mensagem-sem-historico");
+
+// Guardamos aqui, em uma variável do módulo, os livros que vieram
+// do servidor (já com os dados do empréstimo ativo embutidos).
+let livros = [];
 
 // ---------- Funções de data (mesmo padrão das aulas anteriores) ----------
 
@@ -52,7 +61,13 @@ function formatarDataBR(dataISO) {
   return `${dia}/${mes}/${ano}`;
 }
 
-// ---------- Funções auxiliares de validação/alerta ----------
+// ---------- Alerta e validação (mesmo padrão das aulas anteriores) ----------
+
+function mostrarAlerta(tipo, mensagem) {
+  campoAlerta.textContent = mensagem;
+  campoAlerta.className = `alerta alerta--${tipo}`;
+  campoAlerta.hidden = false;
+}
 
 function mostrarErroDoCampo(idCampo, mensagem) {
   const campoErro = document.getElementById(`erro-${idCampo}`);
@@ -68,34 +83,12 @@ function limparErros() {
   });
 }
 
-function mostrarAlerta(tipo, mensagem) {
-  campoAlertaEmprestimo.textContent = mensagem;
-  campoAlertaEmprestimo.className = `alerta alerta--${tipo}`;
-  campoAlertaEmprestimo.hidden = false;
-}
-
 // ---------- Carregar dados da API ----------
 
-// Busca os livros e preenche o select só com os disponíveis.
-// A filtragem por "disponivel" continua sendo feita aqui no
-// frontend (a API devolve todos os livros) — é só uma questão
-// de conveniência da tela, não é a regra de negócio em si (essa
-// já está garantida no servidor, na rota POST /api/emprestimos).
-async function carregarLivrosDisponiveis() {
+async function carregarLivros() {
   const resposta = await fetch(URL_API_LIVROS);
   if (!resposta.ok) throw new Error("Falha ao buscar livros.");
-  const livros = await resposta.json();
-
-  const livrosDisponiveis = livros.filter((livro) => livro.status === "disponivel");
-
-  selectLivro.length = 1; // mantém só a primeira opção ("Selecione...")
-  livrosDisponiveis.forEach((livro) => {
-    const opcao = document.createElement("option");
-    opcao.value = livro.id;
-    opcao.textContent = `${livro.titulo} — ${livro.autor}`;
-    selectLivro.appendChild(opcao);
-  });
-  selectLivro.disabled = livrosDisponiveis.length === 0;
+  livros = await resposta.json();
 }
 
 async function carregarAlunos() {
@@ -103,20 +96,13 @@ async function carregarAlunos() {
   if (!resposta.ok) throw new Error("Falha ao buscar alunos.");
   const alunos = await resposta.json();
 
-  selectAluno.length = 1;
+  selectAluno.length = 1; // mantém só a primeira opção ("Selecione...")
   alunos.forEach((aluno) => {
     const opcao = document.createElement("option");
     opcao.value = aluno.id;
     opcao.textContent = aluno.turma ? `${aluno.nome} (${aluno.turma})` : aluno.nome;
     selectAluno.appendChild(opcao);
   });
-}
-
-async function carregarEmprestimosAtivos() {
-  const resposta = await fetch(URL_API_EMPRESTIMOS);
-  if (!resposta.ok) throw new Error("Falha ao buscar empréstimos ativos.");
-  const emprestimos = await resposta.json();
-  renderizarEmprestimosAtivos(emprestimos);
 }
 
 async function carregarHistorico() {
@@ -127,37 +113,57 @@ async function carregarHistorico() {
 }
 
 // Recarrega tudo que pode ter mudado depois de um
-// empréstimo/devolução: a lista de livros disponíveis (para o
-// select), os empréstimos ativos e o histórico.
+// empréstimo/devolução.
 async function recarregarTudo() {
-  await Promise.all([carregarLivrosDisponiveis(), carregarEmprestimosAtivos(), carregarHistorico()]);
+  await carregarLivros();
+  renderizarLivros(filtrarLivros(campoDeBusca.value));
+  await carregarHistorico();
 }
 
-// ---------- Renderização das tabelas ----------
+// ---------- Renderização da tabela de acervo + empréstimos ----------
 
-function renderizarEmprestimosAtivos(emprestimos) {
-  corpoTabelaAtivos.innerHTML = "";
+function formatarCelulaStatus(livro) {
+  if (livro.status !== "emprestado") {
+    return `<span class="badge badge--disponivel">Disponível</span>`;
+  }
 
-  emprestimos.forEach((emprestimo) => {
-    // O botão de devolução só aparece para quem está logado —
-    // quem não está nem precisa ver um botão que, ao clicar,
-    // só devolveria um 401 do servidor.
-    const celulaAcao = sessaoAtual
-      ? `<button type="button" class="botao botao--secundario" data-id="${emprestimo.id}">Registrar devolução</button>`
-      : "—";
+  const previsao = livro.dataPrevista ? formatarDataBR(livro.dataPrevista) : "—";
+  const atrasado = livro.dataPrevista && livro.dataPrevista < obterDataHojeISO();
 
+  return `
+    <span class="badge badge--emprestado">Emprestado</span>
+    <br>
+    <small class="${atrasado ? "texto-atrasado" : ""}">
+      Com ${livro.alunoNome || "—"} — devolução até ${previsao}${atrasado ? " (atrasado)" : ""}
+    </small>
+  `;
+}
+
+function formatarCelulaAcao(livro) {
+  if (livro.status === "disponivel") {
+    return `<button type="button" class="botao botao--secundario" data-acao="emprestar" data-id="${livro.id}" data-titulo="${livro.titulo} — ${livro.autor}">Emprestar</button>`;
+  }
+  return `<button type="button" class="botao botao--secundario" data-acao="devolver" data-emprestimo-id="${livro.emprestimoId}">Registrar devolução</button>`;
+}
+
+function renderizarLivros(listaParaMostrar) {
+  corpoDaTabelaAcervo.innerHTML = "";
+
+  mensagemVazio.hidden = listaParaMostrar.length > 0;
+
+  listaParaMostrar.forEach((livro) => {
     const linha = document.createElement("tr");
     linha.innerHTML = `
-      <td>${emprestimo.livroTitulo}</td>
-      <td>${emprestimo.alunoNome}</td>
-      <td>${formatarDataBR(emprestimo.dataEmprestimo)}</td>
-      <td>${formatarDataBR(emprestimo.dataPrevista)}</td>
-      <td>${celulaAcao}</td>
+      <td>${livro.titulo}</td>
+      <td>${livro.autor}</td>
+      <td>${livro.categoria}</td>
+      <td>${livro.ano}</td>
+      <td>${livro.isbn || "—"}</td>
+      <td>${formatarCelulaStatus(livro)}</td>
+      <td>${formatarCelulaAcao(livro)}</td>
     `;
-    corpoTabelaAtivos.appendChild(linha);
+    corpoDaTabelaAcervo.appendChild(linha);
   });
-
-  mensagemSemEmprestimos.hidden = emprestimos.length > 0;
 }
 
 function renderizarHistorico(historico) {
@@ -178,22 +184,95 @@ function renderizarHistorico(historico) {
   mensagemSemHistorico.hidden = historico.length > 0;
 }
 
-// ---------- Registrar um novo empréstimo ----------
+// Filtra a lista de livros (já carregada) pelo texto digitado no
+// campo de busca — igual à Aula 2, só que sobre os dados já
+// enriquecidos com o empréstimo ativo.
+function filtrarLivros(termo) {
+  const termoNormalizado = termo.trim().toLowerCase();
+
+  if (termoNormalizado === "") {
+    return livros;
+  }
+
+  return livros.filter((livro) => {
+    return (
+      livro.titulo.toLowerCase().includes(termoNormalizado) ||
+      livro.autor.toLowerCase().includes(termoNormalizado)
+    );
+  });
+}
+
+campoDeBusca.addEventListener("input", (evento) => {
+  renderizarLivros(filtrarLivros(evento.target.value));
+});
+
+// ---------- Painel de empréstimo (abre a partir da linha clicada) ----------
+
+function abrirPainelEmprestimo(livroId, tituloEAutor) {
+  limparErros();
+  campoLivroId.value = livroId;
+  painelEmprestimoTitulo.textContent = tituloEAutor;
+  painelEmprestimo.hidden = false;
+  painelEmprestimo.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function fecharPainelEmprestimo() {
+  painelEmprestimo.hidden = true;
+  formularioEmprestimo.reset();
+  limparErros();
+}
+
+botaoCancelarEmprestimo.addEventListener("click", fecharPainelEmprestimo);
+
+// Delegação de evento: um único listener no <tbody> cobre os
+// botões "Emprestar" e "Registrar devolução" de todas as linhas,
+// mesmo as recriadas a cada renderização (busca, recarregamento).
+corpoDaTabelaAcervo.addEventListener("click", async (evento) => {
+  const botao = evento.target.closest("button[data-acao]");
+  if (!botao) return;
+
+  if (botao.dataset.acao === "emprestar") {
+    abrirPainelEmprestimo(botao.dataset.id, botao.dataset.titulo);
+    return;
+  }
+
+  // data-acao === "devolver": executa direto, sem formulário.
+  const idEmprestimo = botao.dataset.emprestimoId;
+  try {
+    const resposta = await fetch(`${URL_API_EMPRESTIMOS}/${idEmprestimo}/devolucao`, {
+      method: "PUT",
+    });
+    const corpo = await resposta.json();
+
+    if (!resposta.ok) {
+      if (resposta.status === 401) {
+        mostrarAlerta("erro", "Sua sessão expirou. Faça login novamente para registrar devoluções.");
+        await verificarAcessoEInicializar();
+        return;
+      }
+      mostrarAlerta("erro", corpo.erro || "Não foi possível registrar a devolução.");
+      return;
+    }
+
+    mostrarAlerta("sucesso", "Devolução registrada com sucesso.");
+    await recarregarTudo();
+  } catch (erro) {
+    console.error("Falha de rede ao registrar devolução:", erro);
+    mostrarAlerta("erro", "Não foi possível falar com o servidor. Verifique se o backend está rodando.");
+  }
+});
+
+// ---------- Confirmar o empréstimo ----------
 
 function validarFormularioEmprestimo() {
   limparErros();
 
-  const livroId = selectLivro.value;
   const alunoId = selectAluno.value;
   const dataPrevista = formularioEmprestimo["data-prevista"].value;
   const hojeISO = obterDataHojeISO();
 
   let valido = true;
 
-  if (!livroId) {
-    mostrarErroDoCampo("livro", "Selecione um livro.");
-    valido = false;
-  }
   if (!alunoId) {
     mostrarErroDoCampo("aluno", "Selecione um aluno.");
     valido = false;
@@ -205,7 +284,7 @@ function validarFormularioEmprestimo() {
 
   if (!valido) return null;
 
-  return { livroId: Number(livroId), alunoId: Number(alunoId), dataPrevista };
+  return { livroId: Number(campoLivroId.value), alunoId: Number(alunoId), dataPrevista };
 }
 
 formularioEmprestimo.addEventListener("submit", async (evento) => {
@@ -224,25 +303,20 @@ formularioEmprestimo.addEventListener("submit", async (evento) => {
       body: JSON.stringify(dados),
     });
 
-    // O corpo da resposta (sucesso OU erro) sempre vem em JSON,
-    // então lemos ele independente do status.
     const corpo = await resposta.json();
 
     if (!resposta.ok) {
       if (resposta.status === 401) {
         mostrarAlerta("erro", "Sua sessão expirou. Faça login novamente para registrar empréstimos.");
-        await atualizarEstadoLogin();
+        await verificarAcessoEInicializar();
         return;
       }
-      // Aqui mostramos a mensagem que o SERVIDOR mandou (ex.:
-      // "Este livro não está disponível para empréstimo."),
-      // que é a regra de negócio real sendo aplicada.
       mostrarAlerta("erro", corpo.erro || "Não foi possível registrar o empréstimo.");
       return;
     }
 
     mostrarAlerta("sucesso", "Empréstimo registrado com sucesso.");
-    formularioEmprestimo.reset();
+    fecharPainelEmprestimo();
     await recarregarTudo();
   } catch (erro) {
     console.error("Falha de rede ao registrar empréstimo:", erro);
@@ -250,62 +324,30 @@ formularioEmprestimo.addEventListener("submit", async (evento) => {
   }
 });
 
-// ---------- Registrar uma devolução ----------
-
-// Delegação de evento: um único listener no <tbody> cobre todos
-// os botões "Registrar devolução", mesmo os recriados a cada
-// renderização.
-corpoTabelaAtivos.addEventListener("click", async (evento) => {
-  const botao = evento.target.closest("button[data-id]");
-  if (!botao) return;
-
-  const id = botao.dataset.id;
-
-  try {
-    const resposta = await fetch(`${URL_API_EMPRESTIMOS}/${id}/devolucao`, {
-      method: "PUT",
-    });
-    const corpo = await resposta.json();
-
-    if (!resposta.ok) {
-      if (resposta.status === 401) {
-        mostrarAlerta("erro", "Sua sessão expirou. Faça login novamente para registrar devoluções.");
-        await atualizarEstadoLogin();
-        return;
-      }
-      mostrarAlerta("erro", corpo.erro || "Não foi possível registrar a devolução.");
-      return;
-    }
-
-    mostrarAlerta("sucesso", "Devolução registrada com sucesso.");
-    await recarregarTudo();
-  } catch (erro) {
-    console.error("Falha de rede ao registrar devolução:", erro);
-    mostrarAlerta("erro", "Não foi possível falar com o servidor. Verifique se o backend está rodando.");
-  }
-});
-
-// ---------- Login (Aula 11) ----------
-
-// Consulta a sessão atual e mostra/esconde o formulário de
-// empréstimo de acordo. A tabela de consulta continua visível
-// para todo mundo, logado ou não.
-async function atualizarEstadoLogin() {
-  sessaoAtual = await obterSessaoAtual();
-
-  formularioEmprestimo.hidden = !sessaoAtual;
-  mensagemLoginNecessario.hidden = Boolean(sessaoAtual);
-}
-
 // ---------- Inicialização da página ----------
 
-async function inicializar() {
+// Evolução 1 — a consulta inteira agora exige login. Se não houver
+// sessão válida, nem tentamos carregar dados (a API responderia
+// 401 de qualquer forma): mostramos só o aviso pedindo login.
+async function verificarAcessoEInicializar() {
+  const sessao = await obterSessaoAtual();
+
+  if (!sessao) {
+    mensagemLoginNecessario.hidden = false;
+    conteudoProtegido.hidden = true;
+    return;
+  }
+
+  mensagemLoginNecessario.hidden = true;
+  conteudoProtegido.hidden = false;
+
   document.getElementById("data-prevista").min = obterDataHojeISO();
   mensagemCarregando.hidden = false;
 
   try {
-    await atualizarEstadoLogin();
-    await Promise.all([carregarLivrosDisponiveis(), carregarAlunos(), carregarEmprestimosAtivos(), carregarHistorico()]);
+    await carregarLivros();
+    renderizarLivros(livros);
+    await Promise.all([carregarAlunos(), carregarHistorico()]);
   } catch (erro) {
     console.error("Falha ao carregar dados iniciais:", erro);
     mostrarAlerta(
@@ -317,4 +359,4 @@ async function inicializar() {
   }
 }
 
-inicializar();
+verificarAcessoEInicializar();

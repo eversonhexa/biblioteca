@@ -15,6 +15,9 @@
 // Ajuste (depois da Aula 11) — campo ISBN: opcional, mas quando
 // informado precisa ter exatamente 13 dígitos e ser único (dois
 // livros não podem compartilhar o mesmo ISBN).
+//
+// Ajuste (cadastro de livros) — campo editora: opcional, sem
+// formato especial (é só texto livre, como "Companhia das Letras").
 // ==========================================================
 
 const express = require("express");
@@ -33,9 +36,29 @@ function normalizarIsbn(valorBruto) {
 }
 
 // GET /api/livros
-router.get("/", async (req, res) => {
+// Evolução 1 — a consulta ao acervo passou a exigir login (antes,
+// qualquer pessoa podia ver a lista de livros sem estar autenticada).
+//
+// A consulta também ganhou um LEFT JOIN com emprestimos/alunos: além
+// dos dados do livro, cada linha já vem com quem pegou emprestado e
+// até quando (quando o livro estiver emprestado), para a tela única
+// de Consulta e Empréstimos não precisar de uma segunda chamada à
+// API só para descobrir isso.
+router.get("/", exigirLogin, async (req, res) => {
   try {
-    const [linhas] = await pool.query("SELECT * FROM livros ORDER BY titulo");
+    const [linhas] = await pool.query(
+      `SELECT
+         livros.*,
+         emprestimos.id AS emprestimoId,
+         alunos.nome AS alunoNome,
+         emprestimos.data_prevista AS dataPrevista
+       FROM livros
+       LEFT JOIN emprestimos
+         ON emprestimos.livro_id = livros.id
+         AND emprestimos.data_devolucao IS NULL
+       LEFT JOIN alunos ON alunos.id = emprestimos.aluno_id
+       ORDER BY livros.titulo`
+    );
     res.json(linhas);
   } catch (erro) {
     console.error("Falha ao buscar livros:", erro.message);
@@ -45,7 +68,7 @@ router.get("/", async (req, res) => {
 
 // POST /api/livros
 router.post("/", exigirLogin, async (req, res) => {
-  const { titulo, autor, categoria, ano, isbn } = req.body;
+  const { titulo, autor, categoria, ano, isbn, editora } = req.body;
   const anoAtual = new Date().getFullYear();
 
   // Assim como no formulário (js/cadastro.js), validamos os
@@ -77,14 +100,18 @@ router.post("/", exigirLogin, async (req, res) => {
     erros.push("O ISBN, se informado, deve ter 13 dígitos.");
   }
 
+  // Editora é opcional, assim como o ISBN — alguns livros do acervo
+  // (principalmente os mais antigos) não têm essa informação à mão.
+  const editoraNormalizada = typeof editora === "string" ? editora.trim() : "";
+
   if (erros.length > 0) {
     return res.status(400).json({ erro: erros.join(" ") });
   }
 
   try {
     const [resultado] = await pool.query(
-      "INSERT INTO livros (titulo, autor, categoria, ano, isbn, status) VALUES (?, ?, ?, ?, ?, 'disponivel')",
-      [titulo.trim(), autor.trim(), categoria, anoNumero, isbnNormalizado || null]
+      "INSERT INTO livros (titulo, autor, categoria, ano, isbn, editora, status) VALUES (?, ?, ?, ?, ?, ?, 'disponivel')",
+      [titulo.trim(), autor.trim(), categoria, anoNumero, isbnNormalizado || null, editoraNormalizada || null]
     );
 
     res.status(201).json({
@@ -96,6 +123,7 @@ router.post("/", exigirLogin, async (req, res) => {
         categoria,
         ano: anoNumero,
         isbn: isbnNormalizado || null,
+        editora: editoraNormalizada || null,
         status: "disponivel",
       },
     });

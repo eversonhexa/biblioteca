@@ -14,9 +14,18 @@ const exigirLogin = require("../middlewares/exigirLogin");
 
 const router = express.Router();
 
-// GET /api/emprestimos            → ativos
+// GET /api/emprestimos            → ativos (ordenados por data
+//                                    prevista ASC — ou seja, os
+//                                    mais atrasados/mais próximos
+//                                    do vencimento aparecem primeiro;
+//                                    é essa ordenação que a tela
+//                                    "Livros em atraso" reaproveita)
 // GET /api/emprestimos?status=historico → devolvidos
-router.get("/", async (req, res) => {
+//
+// Evolução 1 — passou a exigir login, já que só é usada dentro de
+// telas que agora exigem sessão válida (Consulta e Empréstimos,
+// Livros em atraso).
+router.get("/", exigirLogin, async (req, res) => {
   const querSomenteHistorico = req.query.status === "historico";
 
   const condicao = querSomenteHistorico
@@ -34,7 +43,9 @@ router.get("/", async (req, res) => {
          emprestimos.livro_id AS livroId,
          emprestimos.aluno_id AS alunoId,
          livros.titulo AS livroTitulo,
+         livros.isbn AS livroIsbn,
          alunos.nome AS alunoNome,
+         alunos.turma AS alunoTurma,
          emprestimos.data_emprestimo AS dataEmprestimo,
          emprestimos.data_prevista AS dataPrevista,
          emprestimos.data_devolucao AS dataDevolucao

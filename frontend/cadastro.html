@@ -11,16 +11,19 @@
 
   <header class="cabecalho">
     <div class="cabecalho__conteudo">
-      <a href="index.html" class="cabecalho__logo">📚 Biblioteca Escolar</a>
+      <a href="index.html" class="cabecalho__logo">
+        <img src="assets/logo-miguel-gontijo.png" alt="" class="cabecalho__logo-img">
+        Biblioteca Miguel Gontijo
+      </a>
 
       <nav class="menu">
         <ul class="menu__lista">
           <li><a href="index.html" class="menu__link">Início</a></li>
-          <li><a href="acervo.html" class="menu__link">Acervo</a></li>
-          <li><a href="emprestimos.html" class="menu__link">Empréstimos</a></li>
+          <li><a href="emprestimos.html" class="menu__link">Consulta e Empréstimos</a></li>
+          <li><a href="atrasados.html" class="menu__link">Livros em atraso</a></li>
           <li><a href="cadastro.html" class="menu__link menu__link--ativo">Cadastrar Livro</a></li>
           <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
-          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
+          <li><a href="index.html" class="menu__link" id="link-conta">Entrar</a></li>
         </ul>
       </nav>
     </div>
@@ -80,6 +83,13 @@
           <small class="campo__erro" id="erro-isbn"></small>
         </div>
 
+        <div class="campo">
+          <label for="editora">Editora</label>
+          <input type="text" id="editora" name="editora" placeholder="Ex.: Companhia das Letras" maxlength="120" autocomplete="off">
+          <small class="campo__dica">Opcional.</small>
+          <small class="campo__erro" id="erro-editora"></small>
+        </div>
+
         <button type="submit" class="botao botao--primario">Cadastrar</button>
       </form>
 
@@ -101,6 +111,7 @@
             <th scope="col">Categoria</th>
             <th scope="col">Ano</th>
             <th scope="col">ISBN</th>
+            <th scope="col">Editora</th>
           </tr>
         </thead>
         <tbody id="tabela-cadastrados-corpo"></tbody>

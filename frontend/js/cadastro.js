@@ -14,6 +14,9 @@
 //
 // Ajuste (depois da Aula 11) — campo ISBN, opcional, validado
 // tanto aqui (feedback rápido) quanto no servidor (proteção real).
+//
+// Ajuste (cadastro de livros) — campo editora, opcional, sem
+// nenhuma validação de formato (é só texto livre).
 // ==========================================================
 
 const URL_API_LIVROS = "/api/livros";
@@ -108,11 +111,14 @@ function validarFormulario() {
     valido = false;
   }
 
+  // Editora é opcional e não tem formato para validar — só trim.
+  const editora = formulario.editora.value.trim();
+
   if (!valido) {
     return null;
   }
 
-  return { titulo, autor, categoria, ano, isbn };
+  return { titulo, autor, categoria, ano, isbn, editora };
 }
 
 // Desenha a tabela de livros cadastrados nesta visita.
@@ -127,6 +133,7 @@ function renderizarCadastrados() {
       <td>${livro.categoria}</td>
       <td>${livro.ano}</td>
       <td>${livro.isbn || "—"}</td>
+      <td>${livro.editora || "—"}</td>
     `;
     corpoTabelaCadastrados.appendChild(linha);
   });

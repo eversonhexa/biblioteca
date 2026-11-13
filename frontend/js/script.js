@@ -33,7 +33,7 @@ async function atualizarLinkConta() {
 
   if (!sessao) {
     linkConta.textContent = "Entrar";
-    linkConta.href = "login.html";
+    linkConta.href = "index.html";
     linkConta.onclick = null;
     return;
   }

@@ -2,7 +2,7 @@
 
 Projeto didático de um sistema web para controle do acervo e dos empréstimos de uma biblioteca escolar.
 
-Construído **aos poucos**, em aulas, para ensino de desenvolvimento de sistemas. Cada aula tem um documento próprio dentro de `docs/`, com explicação do que foi feito, por quê, e como testar.
+Construído **aos poucos**, em aulas, para ensino de desenvolvimento de sistemas (Aulas 1 a 12, documentadas uma a uma em `docs/aula-NN-*.md`). Esse roteiro didático está concluído — o projeto agora está evoluindo para uma solução efetiva, pensada para o uso real de uma biblioteca escolar. Cada evolução também ganha um documento próprio em `docs/`, explicando o que mudou, por quê, e como testar.
 
 ## Tecnologias
 
@@ -16,22 +16,21 @@ Construído **aos poucos**, em aulas, para ensino de desenvolvimento de sistemas
 biblioteca-escolar/
 ├── docs/                    → material de aula (uma aula por arquivo)
 ├── frontend/                → tudo que roda no navegador
-│   ├── index.html
-│   ├── acervo.html
+│   ├── index.html              → tela inicial E tela de login (painel de boas-vindas quando já logado)
 │   ├── cadastro.html
 │   ├── cadastro-aluno.html
-│   ├── emprestimos.html
-│   ├── login.html
+│   ├── emprestimos.html        → Consulta e Empréstimos: busca + empréstimo + devolução numa tela só
+│   ├── atrasados.html          → Livros em atraso, ordenados pelo mais atrasado primeiro
 │   ├── css/
 │   │   └── style.css
 │   ├── js/
 │   │   ├── auth.js               → obterSessaoAtual(), encerrarSessao()
 │   │   ├── script.js
-│   │   ├── acervo.js
+│   │   ├── inicio.js              → lógica da tela inicial/login
 │   │   ├── cadastro.js
 │   │   ├── cadastro-aluno.js
 │   │   ├── emprestimos.js
-│   │   ├── login.js
+│   │   ├── atrasados.js
 │   │   ├── dados-acervo.js      → histórico (nenhuma tela usa mais)
 │   │   └── dados-usuarios.js     → histórico (nenhuma tela usa mais)
 │   └── assets/               → imagens, ícones etc.
@@ -43,9 +42,9 @@ biblioteca-escolar/
     ├── middlewares/
     │   └── exigirLogin.js        → exige sessão válida (401 se não houver)
     ├── routes/
-    │   ├── livros.js               → GET / e POST / (protegido)
-    │   ├── alunos.js               → GET / e POST / (protegido)
-    │   ├── emprestimos.js          → POST / e PUT /:id/devolucao (protegidos)
+    │   ├── livros.js               → GET / (protegido; já traz quem pegou cada livro emprestado) e POST / (protegido)
+    │   ├── alunos.js               → GET / e POST / (protegidos)
+    │   ├── emprestimos.js          → GET / (protegido), POST / e PUT /:id/devolucao (protegidos)
     │   └── auth.js               → POST /api/login, GET /api/sessao, POST /api/logout
     ├── utils/
     │   ├── senha.js               → hash/verificação de senha
@@ -72,9 +71,17 @@ biblioteca-escolar/
 - [x] **Aula 11** — Sessão de verdade e proteção das rotas (login passa a valer entre páginas; cadastro de livros passa a gravar no banco)
 - [x] **Aula 12** — Cadastro de alunos (mesmo padrão de Cadastrar Livro, aplicado a um novo recurso)
 
-Roteiro concluído — ideias para continuar depois do curso estão no final de `docs/aula-12-cadastro-alunos.md`.
+Roteiro didático concluído — ideias que estavam no final de `docs/aula-12-cadastro-alunos.md` já viraram a primeira evolução abaixo.
+
+### Evolução para uma solução efetiva
+
+- [x] **Evolução 1** — Página inicial vira a tela de login (com mensagem de boas-vindas/erro); consulta ao acervo passa a exigir login; consulta, empréstimo e devolução viram uma tela só; nova tela de livros em atraso. Detalhes em `docs/evolucao-01-tela-inicial-e-consulta-unificada.md`.
 
 Além do material aula a aula, `docs/conceitos-backend.md` reúne, organizado por assunto (estrutura, configuração, banco de dados, autenticação, integração com o frontend), os conceitos usados na construção do backend — bom para revisão ou para quem quer uma visão geral sem seguir a ordem cronológica das aulas.
+
+Para uma aula teórico-expositiva (sem codificação ao vivo), `docs/roteiro-aula-fluxo-de-requisicao.md` traz um roteiro pronto — com tempo sugerido por bloco e perguntas de verificação — narrando o caminho completo de uma requisição real do sistema, do clique no navegador até a resposta do banco de dados voltar para a tela.
+
+Para levar o projeto para outros computadores (ex.: um laboratório de informática, com cada máquina rodando sua própria cópia), `docs/guia-instalacao-laboratorio.md` tem o passo a passo completo, do empacotamento da pasta até o checklist de conferência em cada computador.
 
 ## Como rodar o projeto completo
 
@@ -82,8 +89,8 @@ Além do material aula a aula, `docs/conceitos-backend.md` reúne, organizado po
 2. Dentro de `backend/`: rode o script `sql/schema.sql` no seu MySQL, copie `.env.example` para `.env` e preencha com sua senha e com um `SESSION_SECRET` (qualquer texto longo). Se o banco já existia antes da Aula 11, veja a nota sobre a coluna `isbn` em `docs/aula-11-sessao-e-protecao-de-rotas.md`.
 3. Ainda em `backend/`: rode `npm install` e depois `node scripts/criar-usuarios.js` (cria os usuários de teste do login).
 4. Rode `npm run dev`.
-5. Acesse `http://localhost:3000/` no navegador — **é obrigatório** ser por aqui, e não mais pelo Live Server, porque o login por sessão (Aula 11) depende de frontend e backend serem a mesma origem.
+5. Acesse `http://localhost:3000/` no navegador — **é obrigatório** ser por aqui, e não mais pelo Live Server, porque o login por sessão (Aula 11) depende de frontend e backend serem a mesma origem. Essa também já é a tela de login, desde a Evolução 1.
 
 Usuários de teste para o login: `bibliotecaria` / `biblioteca123` ou `aluno1` / `aluno123`.
 
-**Observação:** todas as telas (Acervo, Cadastro de Livro, Cadastrar Aluno, Empréstimos e Login) já são 100% integradas ao MySQL. Desde a Aula 11, **cadastrar livros/alunos e registrar empréstimos/devoluções exige estar logado** — a proteção vale tanto na tela quanto direto na API (rotas protegidas devolvem `401` sem sessão válida). O cadastro de livros também ganhou um campo **ISBN** opcional (13 dígitos, único no banco).
+**Observação:** todas as telas já são 100% integradas ao MySQL. Desde a Evolução 1, **consultar o acervo também exige estar logado** (antes, só cadastrar/emprestar/devolver exigia) — a proteção vale tanto na tela quanto direto na API (rotas protegidas devolvem `401` sem sessão válida). O cadastro de livros tem um campo **ISBN** opcional (13 dígitos, único no banco).

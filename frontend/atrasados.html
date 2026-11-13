@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livros em atraso — Biblioteca Escolar</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="cabecalho">
+    <div class="cabecalho__conteudo">
+      <a href="index.html" class="cabecalho__logo">
+        <img src="assets/logo-miguel-gontijo.png" alt="" class="cabecalho__logo-img">
+        Biblioteca Miguel Gontijo
+      </a>
+
+      <nav class="menu">
+        <ul class="menu__lista">
+          <li><a href="index.html" class="menu__link">Início</a></li>
+          <li><a href="emprestimos.html" class="menu__link">Consulta e Empréstimos</a></li>
+          <li><a href="atrasados.html" class="menu__link menu__link--ativo">Livros em atraso</a></li>
+          <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
+          <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
+          <li><a href="index.html" class="menu__link" id="link-conta">Entrar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <section class="emprestimos">
+      <h1>Livros emprestados</h1>
+      <p>
+        Todos os empréstimos em aberto, ordenados pela devolução prevista — os mais
+        atrasados (ou mais próximos de vencer) aparecem primeiro.
+      </p>
+
+      <p id="mensagem-login-necessario" class="aviso-seguranca" hidden>
+        Você precisa <a href="index.html">fazer login</a> para ver os livros emprestados.
+      </p>
+
+      <div id="conteudo-protegido" hidden>
+
+        <div id="alerta" class="alerta" hidden></div>
+
+        <p id="mensagem-carregando" class="mensagem-vazio" hidden>
+          Carregando empréstimos...
+        </p>
+
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th scope="col">Livro</th>
+              <th scope="col">ISBN</th>
+              <th scope="col">Aluno</th>
+              <th scope="col">Turma</th>
+              <th scope="col">Emprestado em</th>
+              <th scope="col">Devolução prevista</th>
+              <th scope="col">Situação</th>
+              <th scope="col">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-atrasados-corpo"></tbody>
+        </table>
+
+        <p id="mensagem-sem-emprestimos" class="mensagem-vazio" hidden>
+          Nenhum empréstimo em aberto no momento — todos os livros já foram devolvidos.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/atrasados.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

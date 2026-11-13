@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Empréstimos — Biblioteca Escolar</title>
+  <title>Consulta e Empréstimos — Biblioteca Escolar</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -11,106 +11,134 @@
 
   <header class="cabecalho">
     <div class="cabecalho__conteudo">
-      <a href="index.html" class="cabecalho__logo">📚 Biblioteca Escolar</a>
+      <a href="index.html" class="cabecalho__logo">
+        <img src="assets/logo-miguel-gontijo.png" alt="" class="cabecalho__logo-img">
+        Biblioteca Miguel Gontijo
+      </a>
 
       <nav class="menu">
         <ul class="menu__lista">
           <li><a href="index.html" class="menu__link">Início</a></li>
-          <li><a href="acervo.html" class="menu__link">Acervo</a></li>
-          <li><a href="emprestimos.html" class="menu__link menu__link--ativo">Empréstimos</a></li>
+          <li><a href="emprestimos.html" class="menu__link menu__link--ativo">Consulta e Empréstimos</a></li>
+          <li><a href="atrasados.html" class="menu__link">Livros em atraso</a></li>
           <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
           <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
-          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
+          <li><a href="index.html" class="menu__link" id="link-conta">Entrar</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <main class="conteudo">
-    <section class="emprestimos">
-      <h1>Empréstimos</h1>
-      <p>Registre o empréstimo de um livro disponível e controle as devoluções.</p>
+    <section class="acervo">
+      <h1>Consulta e Empréstimos</h1>
+      <p>Pesquise um livro e, na própria linha, registre o empréstimo ou a devolução.</p>
 
+      <!-- Evolução 1 — a consulta ao acervo passou a exigir login.
+           Sem sessão válida, esta mensagem substitui a tela inteira
+           (nem a busca nem a tabela aparecem). -->
       <p id="mensagem-login-necessario" class="aviso-seguranca" hidden>
-        Você precisa <a href="login.html">fazer login</a> para registrar empréstimos ou devoluções.
-        A consulta abaixo continua disponível para qualquer pessoa.
+        Você precisa <a href="index.html">fazer login</a> para consultar o acervo e registrar empréstimos ou devoluções.
       </p>
 
-      <form id="form-emprestimo" class="formulario" novalidate>
+      <div id="conteudo-protegido" hidden>
 
-        <div class="campo">
-          <label for="livro">Livro *</label>
-          <select id="livro" name="livro" required>
-            <option value="" selected disabled>Selecione um livro disponível</option>
-          </select>
-          <small class="campo__erro" id="erro-livro"></small>
+        <div id="alerta" class="alerta" hidden></div>
+
+        <div class="acervo__busca">
+          <label for="campo-busca">Buscar por título ou autor:</label>
+          <input
+            type="search"
+            id="campo-busca"
+            placeholder="Ex.: Machado de Assis"
+            autocomplete="off"
+          >
         </div>
 
-        <div class="campo">
-          <label for="aluno">Aluno *</label>
-          <select id="aluno" name="aluno" required>
-            <option value="" selected disabled>Selecione um aluno</option>
-          </select>
-          <small class="campo__erro" id="erro-aluno"></small>
+        <p id="mensagem-carregando" class="mensagem-vazio" hidden>
+          Carregando acervo...
+        </p>
+
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th scope="col">Título</th>
+              <th scope="col">Autor</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Ano</th>
+              <th scope="col">ISBN</th>
+              <th scope="col">Status</th>
+              <th scope="col">Ação</th>
+            </tr>
+          </thead>
+          <!-- As linhas <tr> aqui dentro são geradas pelo JavaScript
+               (js/emprestimos.js), a partir dos dados buscados na
+               API do backend (GET /api/livros, já com quem pegou
+               emprestado cada livro, quando for o caso). -->
+          <tbody id="tabela-acervo-corpo"></tbody>
+        </table>
+
+        <p id="mensagem-vazio" class="mensagem-vazio" hidden>
+          Nenhum livro encontrado com esse termo de busca.
+        </p>
+
+        <!-- Painel de empréstimo: fica escondido até a bibliotecária
+             clicar em "Emprestar" na linha de algum livro disponível.
+             Em vez de escolher o livro em uma lista (como nas aulas
+             anteriores), o livro já vem definido pela linha clicada —
+             só falta escolher o aluno e a data prevista. -->
+        <div id="painel-emprestimo" class="painel-emprestimo" hidden>
+          <h2 class="emprestimos__subtitulo">Registrar empréstimo</h2>
+          <p>Livro selecionado: <strong id="painel-emprestimo-titulo"></strong></p>
+
+          <form id="form-emprestimo" class="formulario" novalidate>
+            <input type="hidden" id="livro-id" name="livro-id">
+
+            <div class="campo">
+              <label for="aluno">Aluno *</label>
+              <select id="aluno" name="aluno" required>
+                <option value="" selected disabled>Selecione um aluno</option>
+              </select>
+              <small class="campo__erro" id="erro-aluno"></small>
+            </div>
+
+            <div class="campo">
+              <label for="data-prevista">Devolução prevista para *</label>
+              <input type="date" id="data-prevista" name="data-prevista" required>
+              <small class="campo__erro" id="erro-data-prevista"></small>
+            </div>
+
+            <div class="painel-emprestimo__botoes">
+              <button type="submit" class="botao botao--primario">Confirmar empréstimo</button>
+              <button type="button" class="botao botao--secundario" id="botao-cancelar-emprestimo">Cancelar</button>
+            </div>
+          </form>
         </div>
 
-        <div class="campo">
-          <label for="data-prevista">Devolução prevista para *</label>
-          <input type="date" id="data-prevista" name="data-prevista" required>
-          <small class="campo__erro" id="erro-data-prevista"></small>
-        </div>
+        <h2 class="emprestimos__subtitulo">Histórico de devoluções</h2>
 
-        <button type="submit" class="botao botao--primario">Registrar empréstimo</button>
-      </form>
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th scope="col">Livro</th>
+              <th scope="col">Aluno</th>
+              <th scope="col">Emprestado em</th>
+              <th scope="col">Devolução prevista</th>
+              <th scope="col">Devolvido em</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-historico-corpo"></tbody>
+        </table>
 
-      <div id="alerta" class="alerta" hidden></div>
-
-      <p id="mensagem-carregando" class="mensagem-vazio" hidden>
-        Carregando dados...
-      </p>
-
-      <h2 class="emprestimos__subtitulo">Empréstimos ativos</h2>
-
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th scope="col">Livro</th>
-            <th scope="col">Aluno</th>
-            <th scope="col">Emprestado em</th>
-            <th scope="col">Devolução prevista</th>
-            <th scope="col">Ação</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-emprestimos-corpo"></tbody>
-      </table>
-
-      <p id="mensagem-sem-emprestimos" class="mensagem-vazio" hidden>
-        Nenhum empréstimo ativo no momento.
-      </p>
-
-      <h2 class="emprestimos__subtitulo">Histórico de devoluções</h2>
-
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th scope="col">Livro</th>
-            <th scope="col">Aluno</th>
-            <th scope="col">Emprestado em</th>
-            <th scope="col">Devolução prevista</th>
-            <th scope="col">Devolvido em</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-historico-corpo"></tbody>
-      </table>
-
-      <p id="mensagem-sem-historico" class="mensagem-vazio" hidden>
-        Nenhuma devolução registrada ainda.
-      </p>
+        <p id="mensagem-sem-historico" class="mensagem-vazio" hidden>
+          Nenhuma devolução registrada ainda.
+        </p>
+      </div>
     </section>
   </main>
 
   <footer class="rodape">
-    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
+    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar.</p>
   </footer>
 
   <script src="js/auth.js"></script>

@@ -48,10 +48,24 @@ body {
 }
 
 .cabecalho__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   color: var(--cor-branco);
   font-size: 1.25rem;
   font-weight: bold;
   text-decoration: none;
+}
+
+/* O brasão é preto (ver docs/evolucao-02-*.md) — um fundo branco
+   arredondado por trás garante contraste sobre a faixa verde do
+   cabeçalho, sem alterar as cores originais do brasão. */
+.cabecalho__logo-img {
+  height: 2.5rem;
+  width: auto;
+  background-color: var(--cor-branco);
+  border-radius: 6px;
+  padding: 2px 5px;
 }
 
 /* ==========================================================
@@ -348,4 +362,62 @@ body {
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
   font-size: 0.85em;
+}
+
+/* ==========================================================
+   10. EVOLUÇÃO 1 — página inicial com boas-vindas, e painel de
+   empréstimo embutido na tela de Consulta e Empréstimos.
+   ========================================================== */
+
+/* Atalhos mostrados no painel de boas-vindas da página inicial,
+   quando já existe alguém logado. */
+.boas-vindas__atalhos {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  max-width: 320px;
+}
+
+.boas-vindas__atalhos .botao {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Texto pequeno, dentro da célula de status, indicando com quem
+   está o livro e até quando — ver formatarCelulaStatus() em
+   js/emprestimos.js. */
+.tabela small {
+  color: #555;
+  font-size: 0.8rem;
+}
+
+.tabela small.texto-atrasado {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+/* Painel que aparece ao clicar em "Emprestar" na tabela de
+   Consulta e Empréstimos — só pede o aluno e a data prevista,
+   já que o livro vem definido pela linha clicada. */
+.painel-emprestimo {
+  margin: 1.5rem 0 2.5rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--cor-branco);
+  border: 1px solid var(--cor-primaria-clara);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.painel-emprestimo h2 {
+  margin-top: 0;
+}
+
+.painel-emprestimo__botoes {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }

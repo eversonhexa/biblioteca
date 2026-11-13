@@ -1,19 +1,41 @@
 // ==========================================================
-// Aula 5 — login simulado (comparava contra um array no navegador)
-// Aula 10 — login de verdade: o servidor confere a senha contra
-//           um hash guardado no banco (POST /api/login)
-// Aula 11 — URL relativa (precisa ser aberta a partir do próprio
-//           backend, http://localhost:3000/...) e redirecionamento
-//           para a página inicial após o login, já que agora o
-//           login cria uma sessão que vale para as outras páginas
+// Evolução 1 — a página inicial passou a ser a própria tela de
+// login (antes, login.html era uma página separada).
+//
+// Comportamento:
+//   - Ninguém logado  → mostra o formulário de login.
+//   - Login com sucesso → sem redirecionar (já estamos na
+//     página inicial!): troca o formulário pelo painel de
+//     boas-vindas, mostrando a mensagem de confirmação.
+//   - Login com erro → mensagem de erro aparece no próprio
+//     formulário (igual às aulas anteriores).
+//   - Alguém que já estava logado e volta ao Início → vê direto
+//     o painel de boas-vindas, sem precisar logar de novo.
 // ==========================================================
 
 const URL_API_LOGIN = "/api/login";
+
+const painelLogin = document.getElementById("painel-login");
+const painelBoasVindas = document.getElementById("painel-boas-vindas");
+const nomeUsuarioLogado = document.getElementById("nome-usuario-logado");
 
 const formularioLogin = document.getElementById("form-login");
 const campoSenha = document.getElementById("senha");
 const checkboxMostrarSenha = document.getElementById("mostrar-senha");
 const campoAlertaLogin = document.getElementById("alerta");
+
+// ---------- Alternar entre os dois painéis ----------
+
+function mostrarPainelBoasVindas(nome) {
+  nomeUsuarioLogado.textContent = nome;
+  painelBoasVindas.hidden = false;
+  painelLogin.hidden = true;
+}
+
+function mostrarPainelLogin() {
+  painelLogin.hidden = false;
+  painelBoasVindas.hidden = true;
+}
 
 // ---------- Mostrar/ocultar senha ----------
 
@@ -21,7 +43,7 @@ checkboxMostrarSenha.addEventListener("change", () => {
   campoSenha.type = checkboxMostrarSenha.checked ? "text" : "password";
 });
 
-// ---------- Validação e alerta (mesmo padrão das aulas anteriores) ----------
+// ---------- Validação e alerta (mesmo padrão das outras telas) ----------
 
 function mostrarErroDoCampo(idCampo, mensagem) {
   const campoErro = document.getElementById(`erro-${idCampo}`);
@@ -48,6 +70,7 @@ function mostrarAlerta(tipo, mensagem) {
 formularioLogin.addEventListener("submit", async (evento) => {
   evento.preventDefault();
   limparErros();
+  campoAlertaLogin.hidden = true;
 
   const usuario = formularioLogin.usuario.value.trim();
   const senha = formularioLogin.senha.value;
@@ -78,24 +101,43 @@ formularioLogin.addEventListener("submit", async (evento) => {
     const corpo = await resposta.json();
 
     if (!resposta.ok) {
-      // A mensagem ("Usuário ou senha inválidos.") vem pronta
-      // do servidor — é ele quem decide o que pode ser revelado.
+      // A mensagem ("Usuário ou senha inválidos.") vem pronta do
+      // servidor — é ele quem decide o que pode ser revelado.
       mostrarAlerta("erro", corpo.erro || "Não foi possível entrar.");
       return;
     }
 
-    mostrarAlerta("sucesso", `Bem-vindo(a), ${corpo.nome}! Redirecionando...`);
     formularioLogin.reset();
     campoSenha.type = "password";
     checkboxMostrarSenha.checked = false;
 
-    // Pequena pausa só para a pessoa conseguir ler a mensagem de
-    // sucesso antes de sair da página.
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 1000);
+    // Troca para o painel de boas-vindas, já confirmando o
+    // sucesso do login — sem precisar redirecionar, porque esta
+    // JÁ é a página inicial.
+    mostrarPainelBoasVindas(corpo.nome);
+
+    // script.js (carregado logo depois deste arquivo) define
+    // atualizarLinkConta() — chamamos de novo aqui para o menu
+    // já trocar "Entrar" por "Sair (nome)" na hora, sem precisar
+    // recarregar a página.
+    if (typeof atualizarLinkConta === "function") {
+      atualizarLinkConta();
+    }
   } catch (erro) {
     console.error("Falha de rede ao tentar login:", erro);
     mostrarAlerta("erro", "Não foi possível falar com o servidor. Verifique se o backend está rodando.");
   }
 });
+
+// ---------- Ao carregar a página ----------
+
+// Se já existe uma sessão válida neste navegador, nem mostramos o
+// formulário — vamos direto para o painel de boas-vindas.
+(async function inicializar() {
+  const sessao = await obterSessaoAtual();
+  if (sessao) {
+    mostrarPainelBoasVindas(sessao.nome);
+  } else {
+    mostrarPainelLogin();
+  }
+})();

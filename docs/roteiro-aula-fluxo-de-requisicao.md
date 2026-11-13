@@ -19,17 +19,17 @@ Ao final da aula, a turma deve ser capaz de:
 
 ## Duração estimada e roteiro sugerido
 
-| Bloco | Assunto                                                          | Tempo sugerido |
-|-------|------------------------------------------------------------------|----------------|
-| 0     | O que é um backend, em uma frase                                 | 5 min          |
-| 1     | De onde vêm as requisições: o ciclo HTTP requisição-resposta     | 10 min         |
-| 2     | Acompanhando uma requisição simples, do clique à tela (`GET`)    | 15 min         |
-| 3     | Onde (e por que, duas vezes) entram as validações                | 10 min         |
-| 4     | Autenticação: uma requisição protegida, passo a passo (`POST`)   | 15 min         |
-| 5     | Por baixo do `pool.query`: a conexão com o banco de dados        | 10 min         |
-| 6     | Quando mais de uma coisa muda ao mesmo tempo: transações (breve) | 10 min         |
-| 7     | Do JSON de volta à tela: como a resposta é usada pelo frontend   | 10 min         |
-|       | Encerramento e perguntas de verificação                          | 5–10 min       |
+| Bloco | Assunto                                                        | Tempo sugerido |
+|-------|------------------------------------------------------------------|-----------------|
+| 0     | O que é um backend, em uma frase                                  | 5 min            |
+| 1     | De onde vêm as requisições: o ciclo HTTP requisição-resposta       | 10 min           |
+| 2     | Acompanhando uma requisição simples, do clique à tela (`GET`)       | 15 min           |
+| 3     | Onde (e por que, duas vezes) entram as validações                    | 10 min           |
+| 4     | Autenticação: uma requisição protegida, passo a passo (`POST`)        | 15 min           |
+| 5     | Por baixo do `pool.query`: a conexão com o banco de dados               | 10 min           |
+| 6     | Quando mais de uma coisa muda ao mesmo tempo: transações (breve)         | 10 min           |
+| 7     | Do JSON de volta à tela: como a resposta é usada pelo frontend             | 10 min           |
+|       | Encerramento e perguntas de verificação                                     | 5–10 min         |
 
 Total aproximado: 90–100 minutos (encaixa em duas aulas de 50 min, se necessário — um bom ponto de corte é entre o Bloco 3 e o Bloco 4).
 
@@ -42,7 +42,7 @@ Ponto de partida para alinhar o vocabulário com a turma:
 Diagrama para desenhar no quadro (ou projetar):
 
 ```
-┌─────────────┐        requisição HTTP         ┌─────────────┐        SQL        ┌─────────────┐
+┌─────────────┐        requisição HTTP        ┌─────────────┐        SQL        ┌─────────────┐
 │  Frontend   │ ─────────────────────────────► │   Backend   │ ─────────────────►│    MySQL    │
 │ (navegador) │ ◄───────────────────────────── │  (Node.js/  │ ◄──────────────── │  (dados     │
 │             │           resposta             │   Express)  │      linhas       │  salvos)    │
@@ -88,10 +88,10 @@ Exemplo guia: a pessoa abre a tela **Acervo** e o sistema busca a lista de livro
 **3. Ela entra na fila de middlewares do Express**, na ordem exata em que foram registrados em `server.js`:
 
 ```js
-app.use(cors());               // libera pedidos de outra origem (quando necessário)
+app.use(cors());              // libera pedidos de outra origem (quando necessário)
 app.use(express.json());       // faz req.body existir, quando há corpo JSON
-app.use(session({ ... }));     // recupera (ou cria) req.session a partir do cookie
-app.use(express.static(...));  // tentaria servir um arquivo estático — não é o caso aqui
+app.use(session({ ... }));      // recupera (ou cria) req.session a partir do cookie
+app.use(express.static(...));    // tentaria servir um arquivo estático — não é o caso aqui
 ```
 
 Como `GET /api/livros` não é um arquivo, `express.static` deixa passar, e a requisição chega até os *routers*.

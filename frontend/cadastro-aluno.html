@@ -11,16 +11,19 @@
 
   <header class="cabecalho">
     <div class="cabecalho__conteudo">
-      <a href="index.html" class="cabecalho__logo">📚 Biblioteca Escolar</a>
+      <a href="index.html" class="cabecalho__logo">
+        <img src="assets/logo-miguel-gontijo.png" alt="" class="cabecalho__logo-img">
+        Biblioteca Miguel Gontijo
+      </a>
 
       <nav class="menu">
         <ul class="menu__lista">
           <li><a href="index.html" class="menu__link">Início</a></li>
-          <li><a href="acervo.html" class="menu__link">Acervo</a></li>
-          <li><a href="emprestimos.html" class="menu__link">Empréstimos</a></li>
+          <li><a href="emprestimos.html" class="menu__link">Consulta e Empréstimos</a></li>
+          <li><a href="atrasados.html" class="menu__link">Livros em atraso</a></li>
           <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
           <li><a href="cadastro-aluno.html" class="menu__link menu__link--ativo">Cadastrar Aluno</a></li>
-          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
+          <li><a href="index.html" class="menu__link" id="link-conta">Entrar</a></li>
         </ul>
       </nav>
     </div>
@@ -32,7 +35,7 @@
       <p>Preencha os dados do aluno para liberar empréstimos em seu nome.</p>
 
       <p id="mensagem-login-necessario" class="aviso-seguranca" hidden>
-        Você precisa <a href="login.html">fazer login</a> para cadastrar alunos.
+        Você precisa <a href="index.html">fazer login</a> para cadastrar alunos.
       </p>
 
       <!-- novalidate: desligamos as mensagens padrão do navegador
@@ -59,12 +62,15 @@
 
       <div id="alerta" class="alerta" hidden></div>
 
-      <h2 class="cadastro__subtitulo">Alunos cadastrados nesta visita</h2>
+      <h2 class="cadastro__subtitulo">Alunos cadastrados</h2>
       <p class="cadastro__aviso">
-        Esta tabela mostra só os alunos que você cadastrou desde que abriu
-        esta página (para dar um retorno rápido). Os dados já são gravados
-        de verdade no banco — o aluno já aparece imediatamente no seletor
-        da tela <a href="emprestimos.html">Empréstimos</a>.
+        Lista completa de alunos já cadastrados no banco. Clique em "Editar"
+        para corrigir o nome ou atualizar a turma — útil quando o aluno muda
+        de turma de um ano para o outro.
+      </p>
+
+      <p id="mensagem-carregando-alunos" class="mensagem-vazio" hidden>
+        Carregando alunos...
       </p>
 
       <table class="tabela">
@@ -72,10 +78,15 @@
           <tr>
             <th scope="col">Nome</th>
             <th scope="col">Turma</th>
+            <th scope="col">Ação</th>
           </tr>
         </thead>
         <tbody id="tabela-cadastrados-corpo"></tbody>
       </table>
+
+      <p id="mensagem-sem-alunos" class="mensagem-vazio" hidden>
+        Nenhum aluno cadastrado ainda.
+      </p>
     </section>
   </main>
 

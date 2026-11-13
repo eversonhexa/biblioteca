@@ -11,37 +11,86 @@
 
   <header class="cabecalho">
     <div class="cabecalho__conteudo">
-      <a href="index.html" class="cabecalho__logo">📚 Biblioteca Escolar</a>
+      <a href="index.html" class="cabecalho__logo">
+        <img src="assets/logo-miguel-gontijo.png" alt="" class="cabecalho__logo-img">
+        Biblioteca Miguel Gontijo
+      </a>
 
       <nav class="menu">
         <ul class="menu__lista">
           <li><a href="index.html" class="menu__link menu__link--ativo">Início</a></li>
-          <li><a href="acervo.html" class="menu__link">Acervo</a></li>
-          <li><a href="emprestimos.html" class="menu__link">Empréstimos</a></li>
+          <li><a href="emprestimos.html" class="menu__link">Consulta e Empréstimos</a></li>
+          <li><a href="atrasados.html" class="menu__link">Livros em atraso</a></li>
           <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
           <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
-          <li><a href="login.html" class="menu__link" id="link-conta">Entrar</a></li>
+          <li><a href="index.html" class="menu__link" id="link-conta">Entrar</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <main class="conteudo">
-    <section class="boas-vindas">
-      <h1>Bem-vindo(a) à Biblioteca Escolar</h1>
-      <p>
-        Este é o ponto de partida do nosso sistema. Nas próximas aulas vamos
-        construir, uma tela de cada vez, as funcionalidades para consultar o
-        acervo, cadastrar livros e controlar os empréstimos.
-      </p>
+  <main class="conteudo conteudo--estreita">
+
+    <!-- Painel mostrado quando NINGUÉM está logado neste navegador.
+         js/inicio.js decide, ao carregar a página, qual dos dois
+         painéis (este ou o de boas-vindas logo abaixo) fica visível. -->
+    <section class="login" id="painel-login">
+      <h1>Entrar</h1>
+      <p>Acesse o sistema com seu usuário e senha.</p>
+
+      <div class="aviso-seguranca">
+        <strong>Usuários de teste</strong> (criados por <code>scripts/criar-usuarios.js</code>):
+        <code>bibliotecaria</code> / <code>biblioteca123</code> ou <code>aluno1</code> / <code>aluno123</code>.
+      </div>
+
+      <form id="form-login" class="formulario" novalidate>
+
+        <div class="campo">
+          <label for="usuario">Usuário *</label>
+          <input type="text" id="usuario" name="usuario" required autocomplete="username">
+          <small class="campo__erro" id="erro-usuario"></small>
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha *</label>
+          <input type="password" id="senha" name="senha" required autocomplete="current-password">
+          <small class="campo__erro" id="erro-senha"></small>
+        </div>
+
+        <div class="campo campo--checkbox">
+          <input type="checkbox" id="mostrar-senha">
+          <label for="mostrar-senha">Mostrar senha</label>
+        </div>
+
+        <button type="submit" class="botao botao--primario">Entrar</button>
+      </form>
+
+      <div id="alerta" class="alerta" hidden></div>
     </section>
+
+    <!-- Painel mostrado quando JÁ existe uma sessão válida — seja
+         porque a pessoa acabou de logar (sem sair desta página),
+         seja porque voltou ao Início já logada de antes. -->
+    <section class="boas-vindas" id="painel-boas-vindas" hidden>
+      <h1>Bem-vindo(a), <span id="nome-usuario-logado"></span>!</h1>
+      <p>Você está conectado ao sistema. Use o menu acima para continuar, ou escolha uma das opções abaixo.</p>
+
+      <ul class="boas-vindas__atalhos">
+        <li><a href="emprestimos.html" class="botao botao--primario">Consultar acervo / registrar empréstimo</a></li>
+        <li><a href="atrasados.html" class="botao botao--secundario">Ver livros em atraso</a></li>
+        <li><a href="cadastro.html" class="botao botao--secundario">Cadastrar livro</a></li>
+        <li><a href="cadastro-aluno.html" class="botao botao--secundario">Cadastrar aluno</a></li>
+      </ul>
+    </section>
+
   </main>
 
   <footer class="rodape">
-    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar — projeto didático.</p>
+    <p>&copy; <span id="ano-atual">2026</span> Biblioteca Escolar.</p>
   </footer>
 
   <script src="js/auth.js"></script>
+  <script src="js/inicio.js"></script>
   <script src="js/script.js"></script>
 </body>
 </html>
