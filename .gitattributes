@@ -1,0 +1,7 @@
+# Padroniza os finais de linha do repositório: o Git decide, para cada
+# arquivo, se é texto (e aplica a conversão LF/CRLF automaticamente
+# conforme o sistema operacional de quem está trabalhando) ou binário
+# (e não mexe nele). Evita o aviso "LF will be replaced by CRLF" e,
+# mais importante, evita diffs gigantes causados só por diferença de
+# final de linha entre Windows e outros sistemas.
+* text=auto
