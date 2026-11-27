@@ -23,7 +23,7 @@
           <li><a href="atrasados.html" class="menu__link">Livros em atraso</a></li>
           <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
           <li><a href="cadastro-aluno.html" class="menu__link menu__link--ativo">Cadastrar Aluno</a></li>
-          <li><a href="index.html" class="menu__link" id="link-conta">Entrar</a></li>
+          <li hidden><a href="#" class="menu__link" id="link-conta"></a></li>
         </ul>
       </nav>
     </div>
@@ -69,6 +69,16 @@
         de turma de um ano para o outro.
       </p>
 
+      <div class="acervo__busca">
+        <label for="campo-busca">Buscar por nome:</label>
+        <input
+          type="search"
+          id="campo-busca"
+          placeholder="Ex.: Carlos"
+          autocomplete="off"
+        >
+      </div>
+
       <p id="mensagem-carregando-alunos" class="mensagem-vazio" hidden>
         Carregando alunos...
       </p>
@@ -83,6 +93,10 @@
         </thead>
         <tbody id="tabela-cadastrados-corpo"></tbody>
       </table>
+
+      <p id="mensagem-vazio" class="mensagem-vazio" hidden>
+        Nenhum aluno encontrado com esse termo de busca.
+      </p>
 
       <p id="mensagem-sem-alunos" class="mensagem-vazio" hidden>
         Nenhum aluno cadastrado ainda.

@@ -8,6 +8,11 @@
 // tempo (ou vai vencer primeiro), por último quem ainda tem mais
 // prazo. Esta tela só precisa desenhar a tabela e destacar quem
 // já está atrasado.
+//
+// Ajuste — ganhou um campo de busca (mesma ideia do
+// js/emprestimos.js), só que pesquisando nos dois campos ao mesmo
+// tempo: título do livro OU nome do aluno, já que aqui as duas
+// informações aparecem juntas na mesma linha.
 // ==========================================================
 
 const URL_API_EMPRESTIMOS = "/api/emprestimos";
@@ -15,9 +20,17 @@ const URL_API_EMPRESTIMOS = "/api/emprestimos";
 const mensagemLoginNecessario = document.getElementById("mensagem-login-necessario");
 const conteudoProtegido = document.getElementById("conteudo-protegido");
 const campoAlerta = document.getElementById("alerta");
+const campoDeBusca = document.getElementById("campo-busca");
 const mensagemCarregando = document.getElementById("mensagem-carregando");
 const corpoTabela = document.getElementById("tabela-atrasados-corpo");
+const mensagemVazio = document.getElementById("mensagem-vazio");
 const mensagemSemEmprestimos = document.getElementById("mensagem-sem-emprestimos");
+
+// Lista de empréstimos ativos tal como veio do servidor, sem
+// nenhum filtro — usada tanto para decidir se existe algum
+// empréstimo em aberto (mensagemSemEmprestimos) quanto como base
+// para o filtro de busca (filtrarEmprestimos).
+let emprestimosAtivos = [];
 
 function obterDataHojeISO() {
   const hoje = new Date();
@@ -57,6 +70,24 @@ function formatarCelulaSituacao(dataPrevistaISO) {
   return `<span class="badge badge--emprestado">Atrasado (${dias})</span>`;
 }
 
+// Filtra os empréstimos já carregados pelo texto digitado no
+// campo de busca, procurando tanto no título do livro quanto no
+// nome do aluno.
+function filtrarEmprestimos(termo) {
+  const termoNormalizado = termo.trim().toLowerCase();
+
+  if (termoNormalizado === "") {
+    return emprestimosAtivos;
+  }
+
+  return emprestimosAtivos.filter((emprestimo) => {
+    return (
+      emprestimo.livroTitulo.toLowerCase().includes(termoNormalizado) ||
+      emprestimo.alunoNome.toLowerCase().includes(termoNormalizado)
+    );
+  });
+}
+
 function renderizarEmprestimos(emprestimos) {
   corpoTabela.innerHTML = "";
 
@@ -75,15 +106,24 @@ function renderizarEmprestimos(emprestimos) {
     corpoTabela.appendChild(linha);
   });
 
-  mensagemSemEmprestimos.hidden = emprestimos.length > 0;
+  // "Nenhum empréstimo em aberto" só quando não existe NENHUM
+  // empréstimo ativo; "nenhum resultado para a busca" é um aviso
+  // separado, para quando a busca não encontra nada mas existem
+  // empréstimos ativos (só não esse termo).
+  mensagemSemEmprestimos.hidden = emprestimosAtivos.length > 0;
+  mensagemVazio.hidden = !(emprestimosAtivos.length > 0 && emprestimos.length === 0);
 }
 
 async function carregarEmprestimosAtivos() {
   const resposta = await fetch(URL_API_EMPRESTIMOS);
   if (!resposta.ok) throw new Error("Falha ao buscar empréstimos ativos.");
-  const emprestimos = await resposta.json();
-  renderizarEmprestimos(emprestimos);
+  emprestimosAtivos = await resposta.json();
+  renderizarEmprestimos(filtrarEmprestimos(campoDeBusca.value));
 }
+
+campoDeBusca.addEventListener("input", (evento) => {
+  renderizarEmprestimos(filtrarEmprestimos(evento.target.value));
+});
 
 // Delegação de evento: um único listener cobre todos os botões
 // "Registrar devolução", mesmo os recriados a cada renderização.

@@ -23,7 +23,7 @@
           <li><a href="atrasados.html" class="menu__link menu__link--ativo">Livros em atraso</a></li>
           <li><a href="cadastro.html" class="menu__link">Cadastrar Livro</a></li>
           <li><a href="cadastro-aluno.html" class="menu__link">Cadastrar Aluno</a></li>
-          <li><a href="index.html" class="menu__link" id="link-conta">Entrar</a></li>
+          <li hidden><a href="#" class="menu__link" id="link-conta"></a></li>
         </ul>
       </nav>
     </div>
@@ -45,6 +45,16 @@
 
         <div id="alerta" class="alerta" hidden></div>
 
+        <div class="acervo__busca">
+          <label for="campo-busca">Buscar por livro ou aluno:</label>
+          <input
+            type="search"
+            id="campo-busca"
+            placeholder="Ex.: Machado de Assis"
+            autocomplete="off"
+          >
+        </div>
+
         <p id="mensagem-carregando" class="mensagem-vazio" hidden>
           Carregando empréstimos...
         </p>
@@ -64,6 +74,10 @@
           </thead>
           <tbody id="tabela-atrasados-corpo"></tbody>
         </table>
+
+        <p id="mensagem-vazio" class="mensagem-vazio" hidden>
+          Nenhum empréstimo encontrado com esse termo de busca.
+        </p>
 
         <p id="mensagem-sem-emprestimos" class="mensagem-vazio" hidden>
           Nenhum empréstimo em aberto no momento — todos os livros já foram devolvidos.

@@ -116,6 +116,8 @@ body {
   max-width: 60ch;          /* limita a largura do texto para facilitar leitura */
 }
 
+
+
 /* ==========================================================
    6. RODAPÉ
    ========================================================== */
@@ -420,4 +422,55 @@ body {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+}
+
+/* ==========================================================
+   11. PAINEL DE LOGIN — CARD CENTRALIZADO
+   ========================================================== */
+
+.login {
+  background-color: var(--cor-branco);
+  border: 1px solid var(--cor-primaria-clara);
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(44, 95, 45, 0.15);
+  text-align: center;
+}
+
+/* Título do painel */
+.login h1 {
+  color: var(--cor-primaria);
+  margin-bottom: 0.5rem;
+}
+
+/* Texto introdutório */
+.login p {
+  margin-bottom: 1rem;
+}
+
+/* Formulário centralizado dentro do painel */
+.login .formulario {
+  margin: 1.5rem auto;
+  width: 100%;
+}
+
+/* Campos de entrada ocupam toda a largura disponível */
+.login .campo {
+  width: 100%;
+  text-align: left;
+}
+
+/* Botão de login centralizado */
+.login .botao {
+  align-self: center;
+}
+
+/* Checkbox mostrar senha alinhado ao centro */
+.login .campo--checkbox {
+  justify-content: center;
+}
+
+/* Caixa de alertas dentro do painel */
+.login .alerta {
+  text-align: center;
 }

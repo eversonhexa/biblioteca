@@ -11,6 +11,10 @@
 // de editar nome e turma de qualquer um deles, via
 // PUT /api/alunos/:id — útil porque o aluno muda de turma de um
 // ano para o outro, e isso não tinha como ser corrigido antes.
+//
+// Ajuste — ganhou também um campo de busca pelo nome, filtrando a
+// lista já carregada (mesma ideia do campo de busca do acervo, em
+// js/emprestimos.js).
 // ==========================================================
 
 const URL_API_ALUNOS = "/api/alunos";
@@ -18,8 +22,10 @@ const URL_API_ALUNOS = "/api/alunos";
 const mensagemLoginNecessario = document.getElementById("mensagem-login-necessario");
 const formulario = document.getElementById("form-cadastro-aluno");
 const campoAlerta = document.getElementById("alerta");
+const campoDeBusca = document.getElementById("campo-busca");
 const corpoTabelaCadastrados = document.getElementById("tabela-cadastrados-corpo");
 const mensagemCarregandoAlunos = document.getElementById("mensagem-carregando-alunos");
+const mensagemVazio = document.getElementById("mensagem-vazio");
 const mensagemSemAlunos = document.getElementById("mensagem-sem-alunos");
 
 // Lista de alunos já cadastrados no banco, carregada do servidor
@@ -98,20 +104,40 @@ function validarFormulario() {
   return { nome, turma };
 }
 
-// Desenha a tabela de alunos cadastrados no banco. A linha cujo id
+// Filtra a lista de alunos já carregada pelo nome digitado no
+// campo de busca.
+function filtrarAlunos(termo) {
+  const termoNormalizado = termo.trim().toLowerCase();
+
+  if (termoNormalizado === "") {
+    return alunos;
+  }
+
+  return alunos.filter((aluno) => aluno.nome.toLowerCase().includes(termoNormalizado));
+}
+
+// Desenha a tabela de alunos cadastrados no banco (já filtrada
+// pelo campo de busca, se houver algo digitado). A linha cujo id
 // é igual a "idEmEdicao" aparece com campos editáveis e os botões
 // "Salvar"/"Cancelar"; todas as outras mostram só o texto e o
 // botão "Editar".
 function renderizarAlunos() {
   corpoTabelaCadastrados.innerHTML = "";
 
-  if (alunos.length === 0) {
-    mensagemSemAlunos.hidden = false;
+  const alunosFiltrados = filtrarAlunos(campoDeBusca.value);
+
+  // "Nenhum aluno cadastrado ainda" só quando a lista cheia (sem
+  // filtro nenhum) está vazia; "nenhum resultado para a busca" é
+  // um aviso separado, para quando a busca não encontra nada mas
+  // existem alunos cadastrados (só não com esse termo).
+  mensagemSemAlunos.hidden = alunos.length > 0;
+  mensagemVazio.hidden = !(alunos.length > 0 && alunosFiltrados.length === 0);
+
+  if (alunosFiltrados.length === 0) {
     return;
   }
-  mensagemSemAlunos.hidden = true;
 
-  alunos.forEach((aluno) => {
+  alunosFiltrados.forEach((aluno) => {
     const linha = document.createElement("tr");
     // data-id na própria linha: dá um jeito estável de localizar a
     // linha de um aluno específico mesmo enquanto ela está em modo
@@ -171,6 +197,8 @@ async function carregarAlunos() {
     mensagemCarregandoAlunos.hidden = true;
   }
 }
+
+campoDeBusca.addEventListener("input", renderizarAlunos);
 
 formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();

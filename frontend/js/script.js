@@ -23,21 +23,30 @@ elementoAno.textContent = dataDeHoje.getFullYear();
 // alguém logado. script.js é carregado em TODAS as páginas
 // (depois de js/auth.js), então é o lugar certo para essa
 // lógica que é igual em qualquer tela.
+//
+// Ajuste — o item só aparece quando TEM alguém logado (virando
+// "Sair (nome)"). Deslogado, ele ficava com o texto "Entrar"
+// apontando para "index.html" — exatamente o mesmo destino do
+// link "Início", já presente no menu. Em vez de mostrar dois
+// links iguais, escondemos o item inteiro nesse caso (em vez de
+// removê-lo do HTML, porque ele volta a aparecer como "Sair"
+// assim que alguém loga).
 // ==========================================================
 
 async function atualizarLinkConta() {
   const linkConta = document.getElementById("link-conta");
   if (!linkConta) return; // segurança, caso alguma página não tenha o link
 
+  const itemConta = linkConta.parentElement;
   const sessao = await obterSessaoAtual();
 
   if (!sessao) {
-    linkConta.textContent = "Entrar";
-    linkConta.href = "index.html";
+    itemConta.hidden = true;
     linkConta.onclick = null;
     return;
   }
 
+  itemConta.hidden = false;
   linkConta.textContent = `Sair (${sessao.nome})`;
   linkConta.href = "#";
   linkConta.onclick = (evento) => {
